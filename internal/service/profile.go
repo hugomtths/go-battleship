@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"os"
+	"fmt"
 )
 
 type Profile struct {
@@ -14,6 +15,24 @@ type Profile struct {
 }
 
 const defaultPath string = "internal/service/saves/profiles.json";
+
+func FindProfile(username string) (*Profile, error) {
+    profiles, err := LoadProfiles()
+    if err != nil {
+        return nil, err
+    }
+
+    for _, p := range profiles {
+        if p.Username == username {
+            // cria uma cópia em memória
+            profile := p
+            return &profile, nil
+        }
+    }
+
+    return nil, fmt.Errorf("profile '%s' not found", username)
+}
+
 
 func SaveProfile(profile Profile) error {
     if _, err := os.Stat(defaultPath); err == nil { // arquivo existe, atualiza Json

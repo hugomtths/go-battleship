@@ -53,6 +53,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	profile2, err := service.FindProfile("Player2");
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("perfil encontrado: %+v\n", profile2);
+
 	//service.RemoveProfile("Player1");
 
 }
