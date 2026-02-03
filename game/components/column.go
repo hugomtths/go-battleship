@@ -5,10 +5,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// TODO: Função de centralizar componentes internamente -> tipos de centralizar (center, end, start)
-// TODO: Text: fontSize, font, caso necessário, tipos de center
-// TODO: Container -> color, child, size, pos, center (com base no seu proprio basic.Size)
-
 // Column organiza widgets em uma coluna, com espaçamento e largura opcional fixa
 // <USAR A LARGURA DO PAI PARA ALINHAMENTO NO EIXO SECUNDARIO (X)>
 type Column struct {
@@ -154,10 +150,6 @@ func (c *Column) calcSize() {
 // GetSize retorna dimensões da column
 func (c *Column) GetSize() basic.Size {
 	return c.size
-}
-
-func (c *Column) SetSize(_ basic.Size) {
-	//criar logica de setsize para todos os elementos terem o size do eixo cruzado??
 }
 
 // init serve para um primeiro posicionamento dos elementos (start x start)

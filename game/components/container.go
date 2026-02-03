@@ -20,12 +20,21 @@ type Container struct {
 	MainAlign  basic.Align
 	CrossAlign basic.Align
 
+	PaddingX, PaddingY int // para evitar que o conteúdo passe para fora
+
 	OnUpdate func(c *Container) //para injetar algum comportamento
 }
 
-func NewContainer(pos basic.Point, size basic.Size,
-	radius float32, color color.Color, mainAlign basic.Align, crossAlign basic.Align,
-	child Widget, callBack func(c *Container)) *Container {
+func NewContainer(
+	pos basic.Point,
+	size basic.Size,
+	radius float32,
+	color color.Color,
+	mainAlign basic.Align,
+	crossAlign basic.Align,
+	child Widget,
+	callBack func(c *Container),
+) *Container {
 	c := &Container{
 		Pos:        pos,
 		Size:       size,
@@ -173,4 +182,18 @@ func drawRoundedRect(dst *ebiten.Image, pos basic.Point, size basic.Size, r floa
 	}
 
 	vector.FillPath(dst, &p, fillOpts, drawOpts)
+}
+
+func (c *Container) SetColor(color color.Color) {
+	c.Color = color
+}
+
+// FitToChild função para ajustar container ao child
+func (c *Container) FitToChild(w Widget) {
+	switch v := w.(type) {
+	case *Text:
+		v.updateSize()
+	}
+	c.Size.W = w.GetSize().W + float32(2*c.PaddingX)
+	c.Size.H = w.GetSize().H + float32(2*c.PaddingY)
 }

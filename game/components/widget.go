@@ -17,8 +17,6 @@ type Widget interface {
 	//Update Atualiza o widget//seus filhos no padrão ebiten
 	Update()
 
-	SetSize(basic.Size)
-
 	// Draw Desenha o widget/seus filhos chamando draw
 	Draw(screen *ebiten.Image)
 

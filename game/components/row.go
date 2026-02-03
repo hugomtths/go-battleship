@@ -162,7 +162,5 @@ func (r *Row) GetSize() basic.Size {
 	return r.size
 }
 
-func (r *Row) SetSize(_ basic.Size) {
-}
 func (r *Row) SetPos(basic.Point) {
 }

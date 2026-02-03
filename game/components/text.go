@@ -13,21 +13,28 @@ import (
 
 // Text widget que desenha texto com uma font.Face
 type Text struct {
-	Pos   basic.Point
-	Color color.Color
-	Text  string
-	face  font.Face
-	Size  basic.Size // opcional, para layout
+	Pos      basic.Point
+	Color    color.Color
+	Text     string
+	face     font.Face
+	Size     basic.Size // opcional, para layout
+	fontSize int
 }
 
 var GoldmanFont *opentype.Font // carregada uma vez
 
-func NewText(pos basic.Point, str string, color color.Color, fontSize int) *Text {
+func NewText(
+	pos basic.Point,
+	str string,
+	color color.Color,
+	fontSize int,
+) *Text {
 	t := &Text{
-		Pos:   pos,
-		Text:  str,
-		Color: color,
-		face:  createFace(float64(fontSize)),
+		Pos:      pos,
+		Text:     str,
+		Color:    color,
+		fontSize: fontSize,
+		face:     createFace(float64(fontSize)),
 	}
 
 	t.updateSize() // calcula Size ao criar
@@ -105,7 +112,20 @@ func (t *Text) Update() {
 	// criar update caso necessário
 }
 
-func (t *Text) GetPos() basic.Point  { return t.Pos }
+func (t *Text) GetPos() basic.Point { return t.Pos }
+
 func (t *Text) SetPos(p basic.Point) { t.Pos = p }
-func (t *Text) GetSize() basic.Size  { return t.Size }
-func (t *Text) SetSize(_ basic.Size) {}
+
+func (t *Text) GetSize() basic.Size { return t.Size }
+
+func (t *Text) SetColor(c color.Color) { t.Color = c }
+
+// SetFontSize re-renderiza texto com outro tamanho de fonte
+func (t *Text) SetFontSize(px int) {
+	if px <= 0 {
+		return
+	}
+	t.fontSize = px
+	t.face = createFace(float64(px))
+	t.updateSize()
+}
