@@ -8,12 +8,15 @@ type RandomStrategy struct {}
 
 const boardSize = 10;
 
-func (s *RandomStrategy) TryAttack(board *entity.Board) bool {
+func (s *RandomStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
+	
 	for {
 		x := rand.Intn(boardSize);
 		y := rand.Intn(boardSize);
 
-		if board.AttackPosition(x, y) {
+		if ai.IsValid(x, y) {
+			ship := board.AttackPositionB(x, y)
+			ai.AdjustStrategy(board, x, y, ship)
 			return true;
 		}
 	}

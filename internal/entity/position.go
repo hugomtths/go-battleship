@@ -14,34 +14,34 @@ func attack(pos *Position) {
 	}
 }
 
-func block(pos *Position) {
+func Block(pos *Position) {
 	pos.blocked = true
 }
 
-func unblock(pos *Position) {
+func Unblock(pos *Position) {
 	pos.blocked = false
 }
 
-func placeShip(pos *Position, ship *Ship) {
+func PlaceShip(pos *Position, ship *Ship) {
 	pos.shipReference = ship
 }
 
-func removeShip(pos *Position) {
+func RemoveShip(pos *Position) {
 	pos.shipReference = nil
 }
 
-func isAttacked(pos Position) bool {
+func IsAttacked(pos Position) bool {
 	return pos.attacked
 }
 
-func isBlocked(pos Position) bool {
+func IsBlocked(pos Position) bool {
 	return pos.blocked
 }
 
-func getShipReference(pos Position) *Ship {
+func GetShipReference(pos Position) *Ship {
 	return pos.shipReference
 }
 
-func isValidPosition(pos Position) bool {
+func IsValidPosition(pos Position) bool {
 	return !pos.attacked && !pos.blocked
 }

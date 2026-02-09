@@ -7,10 +7,10 @@ type Ship struct {
 	Horizontal bool
 }
 
-func isDestroyed(s *Ship) bool {
+func (s *Ship) IsDestroyed() bool {
 	return s.HitCount >= s.Size
 }
 
-func isHorizontal(s *Ship) bool {
+func (s *Ship) IsHorizontal() bool {
 	return s.Horizontal
 }
