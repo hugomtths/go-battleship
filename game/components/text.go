@@ -43,7 +43,7 @@ func NewText(
 
 // InitFonts carrega fonte (*opentype.Font) no inicio do jogo
 func InitFonts() {
-	data, err := os.ReadFile("assets/fonts/Goldman.ttf")
+	data, err := os.ReadFile("assets/fonts/PixelifySans-Bold.ttf")
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func InitFonts() {
 		panic(err)
 	}
 	if GoldmanFont == nil {
-		panic("GoldmanFont não inicializada. Chame InitFonts() antes de criar Text.")
+		panic("Pixelify Sans não inicializada. Chame InitFonts() antes de criar Text.")
 	}
 }
 
