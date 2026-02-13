@@ -21,9 +21,6 @@ type Container struct {
 
 	MainAlign  basic.Align
 	CrossAlign basic.Align
-
-	OnUpdate func(c *Container) //para injetar algum comportamento
-
 }
 
 func NewContainer(
@@ -34,7 +31,6 @@ func NewContainer(
 	mainAlign basic.Align,
 	crossAlign basic.Align,
 	child Widget,
-	callBack func(c *Container),
 ) *Container {
 	c := &Container{
 		Pos:        pos,
@@ -44,10 +40,11 @@ func NewContainer(
 		Child:      child,
 		MainAlign:  mainAlign,
 		CrossAlign: crossAlign,
-		OnUpdate:   callBack,
 	}
-
-	c.alignChild() // aplica alinhamento no filho
+	//caso o container ja se alinhe, não alinha (col e row)
+	if _, ok := c.Child.(LayoutWidget); !ok && c.Child != nil {
+		c.alignChild()
+	}
 
 	return c
 
@@ -56,9 +53,6 @@ func NewContainer(
 func (c *Container) Update(offset basic.Point) {
 	c.currentPos = c.Pos.Add(offset)
 
-	if c.OnUpdate != nil {
-		c.OnUpdate(c)
-	}
 	if c.Child != nil {
 		c.Child.Update(c.currentPos)
 	}

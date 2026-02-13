@@ -8,7 +8,6 @@ import (
 
 func main() {
 	components.InitFonts() // Carrega a fonte apenas uma vez
-
 	g := game.NewGame()
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 

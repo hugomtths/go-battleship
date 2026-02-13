@@ -30,7 +30,6 @@ func ChangeScene(s scenes.Scene) {
 func NewGame() *Game {
 	scenes.SwitchTo = ChangeScene
 	g := &Game{
-		scene: &scenes.PlacementScene{}, // Start with PlacementScene
 	}
 	currentGame = g
 	g.scene.OnEnter(nil, windowSize)

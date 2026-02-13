@@ -23,6 +23,10 @@ type Column struct {
 	size basic.Size //caso necessario
 }
 
+func (c *Column) IsLayout() bool {
+	return true
+}
+
 // NewColumn cria uma coluna e já calcula a posição de todos os widgets
 // alinhando no eixo principal (vertical) e no eixo cruzado (horizontal)
 func NewColumn(
@@ -45,16 +49,15 @@ func NewColumn(
 	// posicionamento inicial (Start/Start)
 	c.init()
 
-	// se ambos forem Start, não faz nada
-	if mainAlign == basic.Start && crossAlign == basic.Start {
-		return c
+	if mainAlign != basic.Start || crossAlign != basic.Start {
+		c.align(parentSize)
 	}
 
-	if mainAlign != basic.Start {
-		c.alignMain(parentSize)
-	}
-	if crossAlign != basic.Start {
-		c.alignCross(parentSize)
+	for _, w := range c.Children {
+		p := w.GetPos()
+		p.X += c.Pos.X
+		p.Y += c.Pos.Y
+		w.SetPos(p)
 	}
 
 	return c
@@ -65,7 +68,7 @@ func (c *Column) Update(offset basic.Point) {
 	c.currentPos = c.Pos.Add(offset)
 
 	for _, w := range c.Children {
-		w.Update(c.Pos.Add(offset))
+		w.Update(c.currentPos)
 	}
 }
 
@@ -74,40 +77,36 @@ func (c *Column) Draw(screen *ebiten.Image) {
 		w.Draw(screen)
 	}
 }
-
-func (c *Column) alignMain(parentSize basic.Size) {
-	content := c.GetSize()
-
+func (c *Column) align(parentSize basic.Size) {
 	var offsetY float32
+
+	// Eixo principal (vertical): calculamos o offsetY com base na altura total
 	switch c.MainAlign {
 	case basic.Start:
-		return
+		offsetY = 0
 	case basic.Center:
-		offsetY = (parentSize.H - content.H) / 2
+		offsetY = (parentSize.H - c.GetSize().H) / 2
 	case basic.End:
-		offsetY = parentSize.H - content.H
+		offsetY = parentSize.H - c.GetSize().H
 	}
 
+	//para cada filho,calcula o x individual
 	for _, w := range c.Children {
 		p := w.GetPos()
-		p.Y += offsetY
-		w.SetPos(p)
-	}
-}
 
-func (c *Column) alignCross(parentSize basic.Size) {
-	for _, w := range c.Children {
-		size := w.GetSize()
-		p := w.GetPos()
+		childWidth := w.GetSize().W
 
 		switch c.CrossAlign {
 		case basic.Start:
-			continue
+			p.X = c.Pos.X // começa no início
 		case basic.Center:
-			p.X = (parentSize.W - size.W) / 2
+			p.X = c.Pos.X + (parentSize.W-childWidth)/2
 		case basic.End:
-			p.X = parentSize.W - size.W
+			p.X = c.Pos.X + (parentSize.W - childWidth)
 		}
+
+		//adiciona o offset do mainaxis
+		p.Y = c.Pos.Y + offsetY + p.Y
 
 		w.SetPos(p)
 	}
@@ -117,8 +116,18 @@ func (c *Column) GetPos() basic.Point {
 	return c.Pos
 }
 
-func (c *Column) SetPos(point basic.Point) {
-	c.Pos = point
+func (c *Column) SetPos(p basic.Point) {
+	dx := p.X - c.Pos.X
+	dy := p.Y - c.Pos.Y
+
+	c.Pos = p
+
+	for _, w := range c.Children {
+		cp := w.GetPos()
+		cp.X += dx
+		cp.Y += dy
+		w.SetPos(cp)
+	}
 }
 
 // calcula tamanho (apenas no init)
@@ -150,13 +159,13 @@ func (c *Column) GetSize() basic.Size {
 
 // init serve para um primeiro posicionamento dos elementos (start x start)
 func (c *Column) init() {
-	cursorY := float32(0)
+	cursorY := c.Pos.Y
 
 	for i, w := range c.Children {
 		size := w.GetSize()
 
 		w.SetPos(basic.Point{
-			X: 0,
+			X: c.Pos.X,
 			Y: cursorY,
 		})
 
