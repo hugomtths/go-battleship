@@ -98,6 +98,16 @@ func (r *Row) align(parentSize basic.Size) {
 
 	//para cada filho,calcula o x individual
 	for _, w := range r.Children {
+
+		if w == nil {
+			continue
+		}
+
+		// se for layout, ele se alinha sozinho (!!!!)
+		if _, ok := w.(LayoutWidget); ok {
+			continue
+		}
+
 		p := w.GetPos()
 
 		childHeight := w.GetSize().H
@@ -119,7 +129,7 @@ func (r *Row) align(parentSize basic.Size) {
 	}
 }
 
-// tamanho ocupado pela row, calculado no init
+// tamanho ocupado pela row, calculado no initWidgets
 func (r *Row) calcSize() {
 	var totalW float32
 	var maxH float32

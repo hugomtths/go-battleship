@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// Button struct que encapsula comportamento por meio de função callback, label, e um corpo que é um container
+// Button struct que encapsula comportamento por meio de função callback, label, e um corpo que é um body
 // a posição é relativa a seu pai (ex: caso va alinhar (usar algo como center - center) e queira que siga seu
 // alinhamento, deixe em 0,0, caso queira mexer, ficará deslocado na posição alinhada + o valor da pos,
 // como se começasse na posição do pai)
@@ -22,8 +22,7 @@ type Button struct {
 	CallBack                   func(*Button) //função que o botão chama
 	hoverColor                 color.Color
 	disabled, hovered, clicked bool
-	scale                      float32        // para animar click
-	body                       StylableWidget //um container por ex
+	body                       StylableWidget //um body por ex
 }
 
 func NewButton(
@@ -38,7 +37,6 @@ func NewButton(
 	bt := &Button{
 		pos:             pos,
 		size:            size,
-		scale:           1.0,
 		label:           label,
 		backgroundColor: color,
 		textColor:       textColor,
@@ -46,7 +44,7 @@ func NewButton(
 		hoverColor:      colors.Lighten(color, 0.25),
 	}
 
-	bt.makeBody() //cria body com container e variaveis de button
+	bt.makeBody() //cria body com body e variaveis de button
 
 	return bt
 }
@@ -91,17 +89,17 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	b.body.Draw(screen)
 }
 
-// makeBody cria container com tamanho texto e cores designadas
+// makeBody cria body com tamanho texto e cores designadas
 func (b *Button) makeBody() {
 
 	if b.textColor == nil {
 		b.textColor = colors.White
 	}
-	//corpo do botão com container
+	//corpo do botão com body
 	b.body = NewContainer(
 		b.pos,
 		b.size, //tamanho original fica guardado
-		16.0,
+		25.0,
 		b.backgroundColor,
 		basic.Center,
 		basic.Center,
