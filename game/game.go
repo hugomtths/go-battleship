@@ -3,6 +3,7 @@ package game
 import (
 	"image/color"
 
+	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -15,12 +16,20 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	g := &Game{
-		scene: &scenes.ExampleScene{},
-	}
-	g.scene.OnEnter(nil, windowSize) //escolher o teste no OnEnter dessa struct
-	return g
+	// 1. Inicializa o estado global do jogo (onde ficam os dados de tabuleiros, etc)
+    state := &state.GameState{} 
+
+    // 2. Cria a cena de perfil passando o estado
+    g := &Game{
+        scene: scenes.NewProfileScene(state),
+    }
+
+    // 3. Notifica a cena que ela entrou em foco
+    g.scene.OnEnter(nil, windowSize) 
+    
+    return g
 }
+
 func (g *Game) Update() error {
 	err := g.scene.Update()
 	return err

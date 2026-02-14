@@ -92,6 +92,15 @@ func (c *Column) align(parentSize basic.Size) {
 
 	//para cada filho,calcula o x individual
 	for _, w := range c.Children {
+
+		if w == nil {
+			continue
+		}
+
+		// se for layout, ele se alinha sozinho (!!!!)
+		if _, ok := w.(LayoutWidget); ok {
+			continue
+		}
 		p := w.GetPos()
 
 		childWidth := w.GetSize().W
@@ -130,7 +139,7 @@ func (c *Column) SetPos(p basic.Point) {
 	}
 }
 
-// calcula tamanho (apenas no init)
+// calcula tamanho (apenas no initWidgets)
 func (c *Column) calcSize() {
 	var totalH float32
 	var maxW float32
@@ -157,7 +166,7 @@ func (c *Column) GetSize() basic.Size {
 	return c.size
 }
 
-// init serve para um primeiro posicionamento dos elementos (start x start)
+// initWidgets serve para um primeiro posicionamento dos elementos (start x start)
 func (c *Column) init() {
 	cursorY := c.Pos.Y
 

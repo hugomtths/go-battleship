@@ -1,128 +1,41 @@
 package main
 
 import (
+	"log"
+
 	"github.com/allanjose001/go-battleship/game"
 	"github.com/allanjose001/go-battleship/game/components"
+	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
-
-	/*//========= teste inserção no tabuleiro ============
-		board1 := new(entity.Board)
-
-		barco1 := new(entity.Ship)
-		barco1.Size = 3
-		barco1.Horizontal = true
-
-		barco2 := new(entity.Ship)
-		barco2.Size = 3
-		barco2.Horizontal = false
-
-		entity.PlaceShip(board1, barco1, 1, 1)
-
-		entity.PlaceShip(board1, barco2, 5, 5)
-
-		entity.PrintBoard(board1)
-
-		//========= teste inserção no tabuleiro ============
-		board1 := new(entity.Board);
-
-		fleet1 := entity.NewFleet();
-
-		board1.PlaceShip(fleet1.GetShipByIndex(0), 1, 1)
-		board1.PlaceShip(fleet1.GetShipByIndex(1), 4, 4)
-
-		entity.PrintBoard(board1);
-
-		//========= teste AI ===========
-
-		//aiPlayer := ai.NewEasyAIPlayer();
-		aiPlayer := ai.NewMediumAIPlayer(fleet1);
-
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-		aiPlayer.Attack(board1);
-
-
-		entity.PrintBoard(board1);
-
-		//========== teste de profile ===========
-
-		profile1 := new(service.Profile);
-		profile1.Username = "Player1";
-		profile1.TotalScore = 200
-		profile1.HighestScore = 50
-		profile1.GamesPlayed = 5
-		profile1.MedalsEarned = 2
-
-		service.SaveProfile(*profile1);
-		//err1 := service.SaveProfile(*profile1)
-
-	  //profile2, err := service.FindProfile("Player2");
-		//if err != nil {
-		//	log.Fatal(err)
-		//}
-
-		//fmt.Printf("perfil encontrado: %+v\n", profile2);
-
-		//service.RemoveProfile("Player1");
-	  //============= teste do front ========================
-
-	aiPlayer.Attack(board1)
-
-	entity.PrintBoard(board1)
-
-	//========== teste de profile ===========
-
-	profile1 := new(service.Profile)
-	profile1.Username = "Player1"
-
-	//========= teste AI ===========
-
-	aiPlayer := ai.NewEasyAIPlayer();
-
-	for i := 0; i < 50; i++ {
-	aiPlayer.Attack(board1);
-
-	entity.PrintBoard(board1);
+	// 1. Setup de dados do Perfil
+	profile := &service.Profile{
+		Username:     "malub",
+		GamesPlayed:  10,
+		MedalsEarned: 4, 
 	}
+	
+	_ = service.SaveProfile(*profile)
 
-	//========== teste de profile ===========
+	// 2. Recursos Visuais
+	components.InitFonts() // Carrega Goldman.ttf para o NewText funcionar
 
-	profile1 := new(service.Profile);
-	profile1.Username = "Player1";
-	profile1.TotalScore = 200
-	profile1.HighestScore = 50
-	profile1.GamesPlayed = 5
-	profile1.MedalsEarned = 2
-
-	service.SaveProfile(*profile1)
-	err := service.SaveProfile(*profile1)
-
-	//profile2, err := service.FindProfile("Player2");
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	//fmt.Printf("perfil encontrado: %+v\n", profile2);
-
-	//service.RemoveProfile("Player1");
-
-	*/
-	components.InitFonts() //carrega a fonte apenas uma vez
-
+	// 3. Inicializa o Jogo
 	g := game.NewGame()
-	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	err := ebiten.RunGame(g)
-	if err != nil {
-		panic(err)
-	}
 
+	// 4. Configuração de Janela e Resolução Lógica
+	ebiten.SetWindowSize(1280, 720) 
+	
+	// SetWindowTitle ajuda a identificar a tela de teste
+	ebiten.SetWindowTitle("Batalha Naval - Profile Scene Debug")
+	
+	// Habilitar redimensionamento sem quebrar o layout (usa o Layout() do game.go)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+
+	// 5. Execução do Loop principal
+	if err := ebiten.RunGame(g); err != nil {
+		log.Fatal(err)
+	}
 }

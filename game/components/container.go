@@ -41,7 +41,7 @@ func NewContainer(
 		MainAlign:  mainAlign,
 		CrossAlign: crossAlign,
 	}
-	//caso o container ja se alinhe, não alinha (col e row)
+	//caso o body ja se alinhe, não alinha (col e row)
 	if _, ok := c.Child.(LayoutWidget); !ok && c.Child != nil {
 		c.alignChild()
 	}
@@ -58,7 +58,7 @@ func (c *Container) Update(offset basic.Point) {
 	}
 }
 
-// Draw desenha o container e seu filho
+// Draw desenha o body e seu filho
 func (c *Container) Draw(screen *ebiten.Image) {
 	DrawRoundedRect(screen, c.currentPos, c.Size, c.Radius, c.Color)
 	if c.Child != nil {
@@ -82,7 +82,7 @@ func (c *Container) SetSize(s basic.Size) {
 	c.Size = s
 }
 
-// alignChild alinhamento de child dentro do container
+// alignChild alinhamento de child dentro do body
 func (c *Container) alignChild() {
 	if c.Child == nil {
 		return
