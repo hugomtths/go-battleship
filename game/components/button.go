@@ -6,7 +6,7 @@ import (
 
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
-	"github.com/allanjose001/go-battleship/game/util"
+	inputhelper "github.com/allanjose001/go-battleship/game/util"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -73,6 +73,12 @@ func (b *Button) Update(point basic.Point) {
 	b.hoverVerify(mouseX, mouseY)
 
 	b.clickVerify(mouseX, mouseY)
+
+	if b.clicked {
+		if b.CallBack != nil {
+			b.CallBack(b)
+		}
+	}
 
 }
 

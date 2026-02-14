@@ -84,32 +84,36 @@ func (r *Row) Draw(screen *ebiten.Image) {
 }
 
 func (r *Row) align(parentSize basic.Size) {
-	content := r.GetSize()
-
 	var offsetX float32
-	var offsetY float32
 
-	// eixo principal (horizontal)
+	// Eixo principal (horizontal): calculamos o offsetX com base na largura total
 	switch r.MainAlign {
+	case basic.Start:
+		offsetX = 0
 	case basic.Center:
-		offsetX = (parentSize.W - content.W) / 2
+		offsetX = (parentSize.W - r.GetSize().W) / 2
 	case basic.End:
-		offsetX = parentSize.W - content.W
+		offsetX = parentSize.W - r.GetSize().W
 	}
 
-	// eixo cruzado (vertical)
-	switch r.CrossAlign {
-	case basic.Center:
-		offsetY = (parentSize.H - content.H) / 2
-	case basic.End:
-		offsetY = parentSize.H - content.H
-	}
-
+	//para cada filho,calcula o x individual
 	for _, w := range r.Children {
 		p := w.GetPos()
 
-		p.X = r.Pos.X + (p.X - r.Pos.X) + offsetX
-		p.Y = r.Pos.Y + (p.Y - r.Pos.Y) + offsetY
+		childHeight := w.GetSize().H
+
+		//alinha eixo cruzado individualmente
+		switch r.CrossAlign {
+		case basic.Start:
+			p.Y = r.Pos.Y // começa no início
+		case basic.Center:
+			p.Y = r.Pos.Y + (parentSize.H-childHeight)/2
+		case basic.End:
+			p.Y = r.Pos.Y + (parentSize.H - childHeight)
+		}
+
+		//adiciona o offset do main axis
+		p.X = r.Pos.X + offsetX + p.X
 
 		w.SetPos(p)
 	}

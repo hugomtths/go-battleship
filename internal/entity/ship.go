@@ -7,6 +7,10 @@ type Ship struct {
 	Horizontal bool
 }
 
+func (s *Ship) Rotate() {
+	s.Horizontal = !s.Horizontal
+}
+
 func (s *Ship) IsDestroyed() bool {
 	return s.HitCount >= s.Size
 }

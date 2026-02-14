@@ -14,8 +14,20 @@ func NewMediumAIPlayer(enemyFleet *entity.Fleet) *AIPlayer {
 	return &AIPlayer{
 		enemyFleet: enemyFleet,
 		Strategies: []Strategy{
-			&DiscoveryStrategy{},
 			&PartialLineStrategy{},
+			&DiscoveryStrategy{},
+			&RandomStrategy{},
+		},
+	}
+}
+
+func NewHardAIPlayer(enemyFleet *entity.Fleet) *AIPlayer {
+	return &AIPlayer{
+		enemyFleet: enemyFleet,
+		Strategies: []Strategy{
+			&StrategicSearchStrategy{},
+			&FullLineStrategy{},
+			&DiscoveryStrategy{},
 			&RandomStrategy{},
 		},
 	}

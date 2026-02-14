@@ -8,6 +8,7 @@ type AIPlayer struct {
 	priorityQueue []Pair
 	Strategies []Strategy
 	enemyFleet *entity.Fleet
+	chaseMode bool
 }
 
 func (ai *AIPlayer) Attack(enemyBoard *entity.Board) {
@@ -18,21 +19,21 @@ func (ai *AIPlayer) Attack(enemyBoard *entity.Board) {
 	}
 }
 
-func (ai *AIPlayer) AdjustStrategy(board *entity.Board, row, col int, ship *entity.Ship) {
+func (ai *AIPlayer) AdjustStrategy(board *entity.Board, row, y int, ship *entity.Ship) {
 	if ship == nil {
-		ai.virtualBoard[row][col] = 1
+		ai.virtualBoard[row][y] = 1
 		return
 	}
 
 	if ship.IsDestroyed() {
-		ai.virtualBoard[row][col] = 3
-		ai.WreckedShipAdjustment(board, row, col) // não implementado
+		ai.virtualBoard[row][y] = 3
+		ai.WreckedShipAdjustment(board, row, y)
 		ai.ClearPriorityQueue()
 		ai.FleetShipDestroyed(ship.Size)
+		ai.StopChase()
 	} else {
-		ai.virtualBoard[row][col] = 2
-		// Descobre vizinhos (modo médio: só AttackNeighbors)
-		ai.AttackNeighbors(row, col)
+		ai.virtualBoard[row][y] = 2
+		ai.AttackNeighbors(row, y)
 	}
 }
 
@@ -62,7 +63,6 @@ func (ai *AIPlayer) LocateShipStart(board *entity.Board, row, col int) (startRow
 	if ship == nil {
 		return row, col
 	}
-
 	startRow, startCol = row, col
 
 	if ship.IsHorizontal() {
@@ -199,13 +199,38 @@ func (ai *AIPlayer) IsValidForTesting(row, col int) bool {
 	return row >= 0 && row < 10 && col >= 0 && col < 10
 }
 
-func (ai *AIPlayer) PopPriority() (x, y int) {
+func (ai *AIPlayer) PopPriority() (row, y int) {
 	if len(ai.priorityQueue) == 0 {
 		return -1, -1
 	}
 
 	p := ai.priorityQueue[0]
 	ai.priorityQueue = ai.priorityQueue[1:]
-	return p.x, p.y
+	return p.row, p.col
 }
 
+func (ai *AIPlayer) StartChase() {
+	ai.chaseMode = true
+}
+
+func (ai *AIPlayer) StopChase() {
+	ai.chaseMode = false
+}
+
+func (ai *AIPlayer) IsChasing() bool {
+	return ai.chaseMode
+}
+
+// Ataca posições estratégicas quando 30% do tabuleiro estiver preenchido
+func (ai *AIPlayer) ShouldAttackStrategicPositions() bool {
+	filled := 0
+
+	for i := 0; i < 10; i++ {
+		for j := 0; j < 10; j++ {
+			if ai.virtualBoard[i][j] != 0 {
+				filled++
+			}
+		}
+	}
+	return float64(filled)/100.0 >= 0.3 
+}

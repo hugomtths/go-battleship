@@ -1,9 +1,11 @@
 package game
 
 import (
-	"image/color"
+	"log"
 
+	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
+	"github.com/allanjose001/go-battleship/game/components/basic/colors"
 	"github.com/allanjose001/go-battleship/game/scenes"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -11,24 +13,38 @@ import (
 var windowSize = basic.Size{W: 1280, H: 720}
 
 type Game struct {
-	scene scenes.Scene
+	// stack que gerencia as rotas das telas do jogo - é como um singleton (única para tod0 o jogo)
+	stack *scenes.SceneStack
 }
 
 func NewGame() *Game {
+	//inicializa fonte ao inicializar game
+	components.InitFonts()
 	g := &Game{
-		scene: &scenes.ExampleScene{},
+		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}), //incializa com primeira scene
 	}
-	g.scene.OnEnter(nil, windowSize) //escolher o teste no OnEnter dessa struct
+
 	return g
 }
 func (g *Game) Update() error {
-	err := g.scene.Update()
-	return err
+
+	if g.stack.IsEmpty() {
+		return ebiten.Termination
+	}
+	err := g.stack.Update()
+	if err != nil {
+		log.Fatal("Erro em stack.Update(): ", err)
+	}
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.RGBA{R: 30, G: 30, B: 30, A: 255})
-	g.scene.Draw(screen)
+	//pinta background
+	screen.Fill(colors.Background)
+
+	if !g.stack.IsEmpty() {
+		g.stack.Draw(screen)
+	}
 }
 
 func (g *Game) Layout(_, _ int) (int, int) {

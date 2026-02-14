@@ -9,10 +9,10 @@ type Board struct {
 }
 
 // variação A que retorna boolean
-func (b *Board) AttackPositionA(x int, y int) bool {
-	fmt.Printf("atacando %v,%v\n", x, y)
-	if b.CheckPosition(x, y) {
-		attack(&b.Positions[x][y])
+func (b *Board) AttackPositionA(row int, col int) bool {
+	fmt.Printf("atacando %v,%v\n", row, col)
+	if b.CheckPosition(row, col) {
+		attack(&b.Positions[row][col])
 
 		return true
 	}
@@ -21,29 +21,29 @@ func (b *Board) AttackPositionA(x int, y int) bool {
 }
 
 // variação B que retorna o navio atacado (ou nil se não houver navio)
-func (b *Board) AttackPositionB(x int, y int) *Ship {
-	fmt.Printf("atacando %v,%v\n", x, y)
-	if b.CheckPosition(x, y) {
-		attack(&b.Positions[x][y])
+func (b *Board) AttackPositionB(row int, col int) *Ship {
+	fmt.Printf("atacando %v,%v\n", row, col)
+	if b.CheckPosition(row, col) {
+		attack(&b.Positions[row][col])
 
-		return GetShipReference(b.Positions[x][y])
+		return GetShipReference(b.Positions[row][col])
 	}
 
 	return nil
 }
 
-func (b *Board) PlaceShip(ship *Ship, x int, y int) bool {
-	if !b.CheckShipPosition(ship, x, y) {
+func (b *Board) PlaceShip(ship *Ship, row int, col int) bool {
+	if !b.CheckShipPosition(ship, row, col) {
 		return false
 	}
 
 	if ship.IsHorizontal() {
-		for i := y; i < y+ship.Size; i++ {
-			PlaceShip(&b.Positions[x][i], ship)
+		for i := col; i < col+ship.Size; i++ {
+			PlaceShip(&b.Positions[row][i], ship)
 		}
 	} else {
-		for i := x; i < x+ship.Size; i++ {
-			PlaceShip(&b.Positions[i][y], ship)
+		for i := row; i < row+ship.Size; i++ {
+			PlaceShip(&b.Positions[i][col], ship)
 		}
 	}
 
@@ -66,24 +66,24 @@ func (b *Board) RemoveShipFromBoard(ship *Ship) {
 	}
 }
 
-func (b *Board) CheckShipPosition(ship *Ship, x int, y int) bool {
+func (b *Board) CheckShipPosition(ship *Ship, row int, col int) bool {
 	if ship.IsHorizontal() { //se o navio estiver na horizontal:
-		if y+ship.Size > 10 { // verifica se o navio ultrapassa os limites do tabuleiro
+		if col+ship.Size > 10 { // verifica se o navio ultrapassa os limites do tabuleiro
 			return false
 		}
 
-		for i := y; i < y+ship.Size; i++ { //se a posição não está bloqueada
-			if !IsValidPosition(b.Positions[x][i]) {
+		for i := col; i < col+ship.Size; i++ { //se a posição não está bloqueada
+			if !IsValidPosition(b.Positions[row][i]) {
 				return false
 			}
 		}
 	} else { // se o navio estiver na vertical:
-		if ship.Size+x > 10 {
+		if ship.Size+row > 10 {
 			return false
 		}
 
-		for i := x; i < x+ship.Size; i++ {
-			if !IsValidPosition(b.Positions[i][y]) {
+		for i := row; i < row+ship.Size; i++ {
+			if !IsValidPosition(b.Positions[i][col]) {
 				return false
 			}
 		}
@@ -92,12 +92,12 @@ func (b *Board) CheckShipPosition(ship *Ship, x int, y int) bool {
 	return true
 }
 
-func (b *Board) CheckPosition(x int, y int) bool {
-	if x < 0 || x > 9 || y < 0 || y > 9 {
+func (b *Board) CheckPosition(row int, col int) bool {
+	if row < 0 || row > 9 || col < 0 || col > 9 {
 		return false
 	}
 
-	return !(IsAttacked(b.Positions[x][y]))
+	return !(IsAttacked(b.Positions[row][col]))
 }
 
 func PrintBoard(b *Board) {

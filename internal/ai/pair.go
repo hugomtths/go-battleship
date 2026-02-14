@@ -1,6 +1,6 @@
 package ai
 
 type Pair struct {
-	x int
-	y int
+	row int
+	col int
 }

@@ -9,8 +9,9 @@ var (
 	Red         = color.RGBA{R: 255, A: 255}
 	Green       = color.RGBA{G: 255, A: 255}
 	Blue        = color.RGBA{G: 200, B: 255, A: 255}
-	Dark        = color.RGBA{R: 2, G: 94, B: 120, A: 255}
+	Dark        = color.RGBA{R: 48, G: 67, B: 103, A: 255}
 	Transparent = color.RGBA{}
+	Background  = color.RGBA{R: 13, G: 27, B: 42, A: 255}
 )
 
 // Lighten função que clareia cor (usado em hover e click em botão)

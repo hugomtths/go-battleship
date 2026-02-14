@@ -53,6 +53,13 @@ func NewColumn(
 		c.align(parentSize)
 	}
 
+	for _, w := range c.Children {
+		p := w.GetPos()
+		p.X += c.Pos.X
+		p.Y += c.Pos.Y
+		w.SetPos(p)
+	}
+
 	return c
 }
 
@@ -71,34 +78,35 @@ func (c *Column) Draw(screen *ebiten.Image) {
 	}
 }
 func (c *Column) align(parentSize basic.Size) {
-	content := c.GetSize()
-
-	var offsetX float32
 	var offsetY float32
 
-	// eixo principal (vertical)
+	// Eixo principal (vertical): calculamos o offsetY com base na altura total
 	switch c.MainAlign {
 	case basic.Start:
+		offsetY = 0
 	case basic.Center:
-		offsetY = (parentSize.H - content.H) / 2
+		offsetY = (parentSize.H - c.GetSize().H) / 2
 	case basic.End:
-		offsetY = parentSize.H - content.H
+		offsetY = parentSize.H - c.GetSize().H
 	}
 
-	// eixo cruzado (horizontal)
-	switch c.CrossAlign {
-	case basic.Start:
-	case basic.Center:
-		offsetX = (parentSize.W - content.W) / 2
-	case basic.End:
-		offsetX = parentSize.W - content.W
-	}
-
+	//para cada filho,calcula o x individual
 	for _, w := range c.Children {
 		p := w.GetPos()
 
-		p.X += offsetX
-		p.Y += offsetY
+		childWidth := w.GetSize().W
+
+		switch c.CrossAlign {
+		case basic.Start:
+			p.X = c.Pos.X // começa no início
+		case basic.Center:
+			p.X = c.Pos.X + (parentSize.W-childWidth)/2
+		case basic.End:
+			p.X = c.Pos.X + (parentSize.W - childWidth)
+		}
+
+		//adiciona o offset do mainaxis
+		p.Y = c.Pos.Y + offsetY + p.Y
 
 		w.SetPos(p)
 	}
