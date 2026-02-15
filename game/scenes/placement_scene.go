@@ -28,6 +28,7 @@ type PlacementScene struct {
 	playRow      *components.Row
 	playerLabel  *components.Text
 	playButton   *components.Button
+	StackHandler
 }
 
 func NewPlacementScene() *PlacementScene {
@@ -173,8 +174,10 @@ func (s *PlacementScene) Update() error {
 	s.playerLabel.Update(basic.Point{})
 
 	// Habilita o botão JOGAR apenas se todos os barcos estiverem posicionados
-	if s.playButton != nil {
-		s.playButton.SetDisabled(!s.AllShipsPlaced())
+
+	if s.AllShipsPlaced() {
+		s.playButton.ToggleDisabled()
+
 	}
 
 	mx, my := ebiten.CursorPosition()
