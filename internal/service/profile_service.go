@@ -16,7 +16,7 @@ var profiles []entity.Profile
 // init carrega profiles em memoria ao iniciar jogo
 func init() {
 	var err error
-	err = loadProfiles() //caso não carregue arquivos o jogo pode continuar normalmente..
+	err = loadProfiles() //caso não carregue arquivos o jogo pode continuar normalmente
 	if err != nil {
 		fmt.Println("Erro carregando profiles:", err) // remover apos integração
 		profiles = []entity.Profile{}
@@ -104,19 +104,42 @@ func RemoveProfile(username string) error {
 	return os.WriteFile(defaultPath, data, 0644)
 }
 
-// GetProfileMedals retorna medalhas (strings) em struct -> [está aqui para evitar cyclic imports]
+// GetProfileMedals retorna medalhas em forma de struct -> [está aqui para evitar cyclic imports]
 func GetProfileMedals(p entity.Profile) []*medal.Medal {
 	return medal.GetMedals(p.MedalsNames)
 }
 
-// AddMatchToProfile repassa salvamento para profile e atualiza saves no arquivo
-func AddMatchToProfile(profile entity.Profile, result entity.MatchResult) error {
-	profile.AddMatch(result)
+// AddMatchToProfile repassa salvamento para profile e atualiza saves no arquivo,
+// retorna numero de medalhas ganhas apos partida
+func AddMatchToProfile(profile *entity.Profile, result entity.MatchResult) (int, error) {
+	profile.History = append(profile.History, result)
 
-	e := UpdateProfile(profile)
+	profile.Stats.ApplyMatch(result)
+
+	newMedals := checkNewMedals(profile)
+
+	e := UpdateProfile(*profile)
 
 	if e != nil {
-		return e
+		return 0, e
 	}
-	return nil
+	return newMedals, nil
+}
+
+// checkNewMedals verifica medalhas do player, atualiza, e retorna o n de novas medalhas
+// (seria method de profile, mas deu cyclic import)
+func checkNewMedals(p *entity.Profile) int {
+	gained := 0
+
+	for name, m := range medal.MedalsMap {
+		if p.HasMedal(name) { // se tem medalha, passa p prox iteração
+			continue
+		}
+
+		if m.Verification(p.Stats) {
+			p.MedalsNames = append(p.MedalsNames, name) //adiciona nova medalha
+			gained++
+		}
+	}
+	return gained
 }

@@ -7,8 +7,12 @@ type Profile struct {
 	History     []MatchResult `json:"history"`
 }
 
-// AddMatch adiciona partida ao histórico e atualiza stats
-func (p *Profile) AddMatch(r MatchResult) {
-	p.History = append(p.History, r)
-	p.Stats.ApplyMatch(r)
+// HasMedal verifica se player possui medalha
+func (p *Profile) HasMedal(name string) bool {
+	for _, m := range p.MedalsNames {
+		if m == name {
+			return true
+		}
+	}
+	return false
 }
