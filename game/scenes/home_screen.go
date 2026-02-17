@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/allanjose001/go-battleship/game/components"
@@ -65,7 +66,9 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
-					//m.stack.Push() //TODO: colocar tela de ESCOLHA de perfis aqui
+					//TODO: colocar tela de ESCOLHA de perfis aqui (BETA RELEASE)
+					fmt.Println("Jogar")
+					m.stack.Push(&PlacementScene{})
 				},
 			),
 
@@ -77,7 +80,6 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				nil,
 				func(bt *components.Button) {
 					//m.stack.Push() //TODO: ir para tela de Ranking
-					log.Println("Botão clicado!")
 				},
 			),
 
@@ -88,6 +90,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
+					fmt.Println("sair")
 					m.stack.Pop() //faz terminator em game
 				},
 			),

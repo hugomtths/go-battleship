@@ -30,3 +30,22 @@ func Lighten(c color.Color, t float64) color.Color {
 		A: uint8(a >> 8),
 	}
 }
+
+// GrayOut deixa a cor acinzentada (para botões disabled)
+func GrayOut(c color.Color, factor float64) color.Color {
+	r16, g16, b16, a16 := c.RGBA()
+
+	// converte de 16-bit para 8-bit
+	r := float64(uint8(r16 >> 8))
+	g := float64(uint8(g16 >> 8))
+	b := float64(uint8(b16 >> 8))
+	a := uint8(a16 >> 8)
+
+	gray := (r + g + b) / 3
+
+	r = r*(1-factor) + gray*factor
+	g = g*(1-factor) + gray*factor
+	b = b*(1-factor) + gray*factor
+
+	return color.RGBA{uint8(r), uint8(g), uint8(b), a}
+}

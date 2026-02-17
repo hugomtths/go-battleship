@@ -17,21 +17,33 @@ import (
 func (b *Board) Draw(screen *ebiten.Image) {
 	cellSize := b.Size / Cols
 
-	for i := 0; i < Rows; i++ {
-		for j := 0; j < Cols; j++ {
-			x := b.X + float64(j)*cellSize
-			y := b.Y + float64(i)*cellSize
+	// Draw Background
+	if b.BackgroundImage != nil {
+		op := &ebiten.DrawImageOptions{}
+		imgW, imgH := b.BackgroundImage.Size()
+		op.GeoM.Scale(b.Size/float64(imgW), b.Size/float64(imgH))
+		op.GeoM.Translate(b.X, b.Y)
+		screen.DrawImage(b.BackgroundImage, op)
+	} else {
+		// Fallback background
+		ebitenutil.DrawRect(screen, b.X, b.Y, b.Size, b.Size, color.RGBA{48, 67, 103, 255})
+	}
 
-			col := color.RGBA{173, 216, 230, 255} // azul claro
-
-			ebitenutil.DrawRect(screen, x, y, cellSize-2, cellSize-2, col)
-		}
+	// Draw Grid Lines (White)
+	gridColor := color.White
+	for i := 0; i <= Rows; i++ {
+		y := b.Y + float64(i)*cellSize
+		ebitenutil.DrawLine(screen, b.X, y, b.X+b.Size, y, gridColor)
+	}
+	for j := 0; j <= Cols; j++ {
+		x := b.X + float64(j)*cellSize
+		ebitenutil.DrawLine(screen, x, b.Y, x, b.Y+b.Size, gridColor)
 	}
 
 	// labels
-	labelSize := float64(cellSize) * 0.35
-	if labelSize < 10 {
-		labelSize = 10
+	labelSize := float64(cellSize) * 0.5
+	if labelSize < 12 {
+		labelSize = 12
 	}
 	tt, _ := opentype.Parse(goregular.TTF)
 	face, _ := opentype.NewFace(tt, &opentype.FaceOptions{
@@ -39,7 +51,7 @@ func (b *Board) Draw(screen *ebiten.Image) {
 		DPI:     72,
 		Hinting: font.HintingFull,
 	})
-	labelColor := color.Black
+	labelColor := color.White
 
 	// topo: letras A-H
 	for j := 0; j < Cols; j++ {
@@ -47,7 +59,7 @@ func (b *Board) Draw(screen *ebiten.Image) {
 		bounds := text.BoundString(face, ch)
 		w := bounds.Dx()
 		x := b.X + float64(j)*cellSize + cellSize/2 - float64(w)/2
-		y := b.Y - 6
+		y := b.Y - 10
 		text.Draw(screen, ch, face, int(x), int(y), labelColor)
 	}
 
@@ -56,7 +68,7 @@ func (b *Board) Draw(screen *ebiten.Image) {
 		num := strconv.Itoa(i + 1)
 		bounds := text.BoundString(face, num)
 		h := bounds.Dy()
-		x := b.X - 14
+		x := b.X - 25
 		y := b.Y + float64(i)*cellSize + cellSize/2 + float64(h)/2 - 2
 		text.Draw(screen, num, face, int(x), int(y), labelColor)
 	}

@@ -34,8 +34,16 @@ func main() {
 	// Habilitar redimensionamento sem quebrar o layout (usa o Layout() do game.go)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
+<<<<<<< develop
+	err := ebiten.RunGame(g)
+	if err != nil {
+		panic(err)
+	}
+}
+=======
 	// 5. Execução do Loop principal
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
 }
+>>>>>>> develop

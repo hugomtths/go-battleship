@@ -30,3 +30,7 @@ type Scene interface {
 	// Não deve alterar regras de jogo, apenas renderizar o estado atual.
 	Draw(screen *ebiten.Image)
 }
+
+// SwitchTo é uma função global para trocar de cena.
+// Deve ser inicializada pelo pacote game.
+var SwitchTo func(Scene)

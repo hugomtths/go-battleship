@@ -11,7 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var windowSize = basic.Size{W: 1280, H: 720}
+var windowSize = basic.Size{W: 1280, H: 800}
 
 type Game struct {
 	// stack que gerencia as rotas das telas do jogo - é como um singleton (única para tod0 o jogo)
@@ -49,13 +49,12 @@ func (g *Game) Update() error {
 	}
 	err := g.stack.Update()
 	if err != nil {
-		log.Fatal("Erro em stack.Update(): ", err)
+		log.Fatal("Erro em stack.Update() em game.go: ", err)
 	}
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	//pinta background
 	screen.Fill(colors.Background)
 
 	if !g.stack.IsEmpty() {

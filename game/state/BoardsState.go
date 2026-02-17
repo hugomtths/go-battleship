@@ -5,6 +5,7 @@ import "github.com/allanjose001/go-battleship/game/shared/board"
 type GameState struct {
 	PlayerBoard *board.Board
 	AIBoard     *board.Board
+	PlayerShips interface{} // Usaremos interface{} temporariamente ou criaremos um tipo compartilhado
 }
 
 func NewGameState() *GameState {
