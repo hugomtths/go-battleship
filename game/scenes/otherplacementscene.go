@@ -46,7 +46,7 @@ func (o *OtherPlacementScene) OnEnter(_ Scene, size basic.Size) {
 						//TODO: Board fica aqui -> cria ele antes, mas adiciona ele aqui para ficar alinhado
 						components.NewContainer(
 							basic.Point{}, boardAndFleetSize,
-							0, colors.Blue,
+							0, colors.NightBlue,
 							basic.Center,
 							basic.Center,
 							nil,

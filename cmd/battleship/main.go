@@ -6,6 +6,7 @@ import (
 	"github.com/allanjose001/go-battleship/game"
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/internal/bootstrap"
+	"github.com/allanjose001/go-battleship/internal/entity"
 	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -14,13 +15,9 @@ func main() {
 	bootstrap.InitRandom()
 
 	// 1. Setup de dados do Perfil
-	profile := &service.Profile{
-		Username:     "malub",
-		GamesPlayed:  10,
-		MedalsEarned: 4,
-	}
+	profile := entity.Profile{Username: "malub"}
 
-	_ = service.SaveProfile(*profile)
+	_ = service.SaveProfile(profile)
 
 	// 2. Recursos Visuais
 	components.InitFonts() // Carrega Goldman.ttf para o NewText funcionar

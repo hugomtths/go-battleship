@@ -9,9 +9,11 @@ import (
 	"github.com/allanjose001/go-battleship/internal/medal"
 )
 
-const defaultPath string = "internal/data/profiles.json"
+const defaultPath string = "internal/service/saves/profiles.json"
 
 var profiles []entity.Profile
+
+type Profile = entity.Profile
 
 // init carrega profiles em memoria ao iniciar jogo
 func init() {
@@ -49,6 +51,15 @@ func loadProfiles() error {
 // SaveProfile é basicamente um alias para update, pois update acaba salvando o profile mesmo assim caso não exista
 func SaveProfile(profile entity.Profile) error {
 	return UpdateProfile(profile)
+}
+
+func FindProfile(username string) (*Profile, error) {
+	for i, p := range profiles {
+		if p.Username == username {
+			return &profiles[i], nil
+		}
+	}
+	return nil, fmt.Errorf("perfil não encontrado: %s", username)
 }
 
 // UpdateProfile atualiza perfil em memoria e no arquivo json
