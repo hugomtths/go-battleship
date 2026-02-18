@@ -3,9 +3,6 @@ package scenes
 import (
 	"fmt"
 	"image/color"
-	"image/gif"
-	"math"
-	"os"
 	"time"
 
 	"github.com/allanjose001/go-battleship/game/components"
@@ -14,88 +11,66 @@ import (
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/game/shared/placement"
 	"github.com/allanjose001/go-battleship/game/state"
-	"github.com/allanjose001/go-battleship/internal/ai"
-	"github.com/allanjose001/go-battleship/internal/entity"
+	"github.com/allanjose001/go-battleship/internal/assets"
+	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+// BattleScene representa a tela de batalha em si.
+// Ela coordena o serviço de batalha, o renderer e os botões de interface.
 type BattleScene struct {
-	state       *state.GameState
-	hitImage    *ebiten.Image
-	fireFrames  []*ebiten.Image
-	fireDelays  []int
-	missImage   *ebiten.Image
+	// svc contém toda a lógica de turnos, ataques e vitória
+	svc *service.BattleService
+	// backButtonRow é a linha que contém o botão de "Recomeçar"
+	backButtonRow *components.Row
+	// playerShips guarda os navios posicionados na fase de placement
 	playerShips []*placement.ShipPlacement
 
-	// Stats
-	playerAttempts int
-	playerHits     int
-	aiAttempts     int
-	aiHits         int
-	isPlayerTurn   bool
+	hitImage   *ebiten.Image
+	missImage  *ebiten.Image
+	fireFrames []*ebiten.Image
+	fireDelays []int
 
-	aiPlayer    *ai.AIPlayer
-	entityBoard *entity.Board
-	entityFleet *entity.Fleet
+	playerNameLabel     *components.Text
+	playerAttemptsLabel *components.Text
+	playerHitsLabel     *components.Text
 
-	backButtonRow *components.Row
+	aiNameLabel     *components.Text
+	aiAttemptsLabel *components.Text
+	aiHitsLabel     *components.Text
 }
 
+// NewBattleScene recebe o estado de jogo gerado na fase de placement
+// e cria um BattleService novo para controlar a batalha.
 func NewBattleScene(gs *state.GameState) *BattleScene {
 	ships, _ := gs.PlayerShips.([]*placement.ShipPlacement)
+	gameSvc := service.NewGameService()
+	svc := service.NewBattleService(gs, gameSvc, ships)
+
 	return &BattleScene{
-		state:        gs,
-		playerShips:  ships,
-		isPlayerTurn: true, // Player starts
+		svc:         svc,
+		playerShips: ships,
 	}
 }
 
+// OnEnter é chamado quando a cena de batalha entra em foco.
+// Aqui configuramos o fundo dos tabuleiros e criamos o botão de recomeçar.
 func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
-	var err error
+	playerBoard := s.svc.PlayerBoard()
+	aiBoard := s.svc.AIBoard()
 
-	// Carregar imagem de fundo
+	// Fundo compartilhado para os dois tabuleiros
 	bg, _, errBg := ebitenutil.NewImageFromFile("assets/images/Mask group.png")
 	if errBg == nil {
-		s.state.PlayerBoard.BackgroundImage = bg
-		s.state.AIBoard.BackgroundImage = bg
+		playerBoard.BackgroundImage = bg
+		aiBoard.BackgroundImage = bg
 	}
 
-	// Carregar Fire.gif como animação
-	f, err := os.Open("assets/images/Fire.gif")
-	if err == nil {
-		defer f.Close()
-		g, err := gif.DecodeAll(f)
-		if err == nil {
-			s.fireFrames = make([]*ebiten.Image, len(g.Image))
-			s.fireDelays = make([]int, len(g.Delay))
-			for i, img := range g.Image {
-				s.fireFrames[i] = ebiten.NewImageFromImage(img)
-				s.fireDelays[i] = g.Delay[i]
-			}
-			if len(s.fireFrames) > 0 {
-				s.hitImage = s.fireFrames[0]
-			}
-		}
-	}
-
-	if s.hitImage == nil {
-		// Fallback se falhar ao carregar gif
-		s.hitImage, _, err = ebitenutil.NewImageFromFile("assets/images/Fire.gif")
-		if err != nil {
-			// Log erro ou lidar
-		}
-	}
-
-	s.missImage, _, err = ebitenutil.NewImageFromFile("assets/images/Ponto que já foi atingido 1.png")
-	if err != nil {
-		// Log erro ou lidar
-	}
-
-	// Botão Recomeçar usando Row (mesma lógica de PlacementScene)
+	// Linha com botão "Recomeçar", que volta para a fase de placement
 	s.backButtonRow = components.NewRow(
-		basic.Point{X: 540, Y: 650}, // Posição centralizada manualmente para tela 1280
+		basic.Point{X: 540, Y: 650},
 		0,
 		basic.Size{W: 200, H: 50},
 		basic.Center,
@@ -114,235 +89,149 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 		},
 	)
 
-	// Inicializar AI
-	s.initAI()
-}
-
-func (s *BattleScene) OnExit(next Scene) {}
-
-func (s *BattleScene) Update() error {
-	s.backButtonRow.Update(basic.Point{})
-	if s.isPlayerTurn && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		mx, my := ebiten.CursorPosition()
-		mouseX, mouseY := float64(mx), float64(my)
-
-		// Ataque no tabuleiro da IA
-		if mouseX >= s.state.AIBoard.X && mouseX <= s.state.AIBoard.X+s.state.AIBoard.Size &&
-			mouseY >= s.state.AIBoard.Y && mouseY <= s.state.AIBoard.Y+s.state.AIBoard.Size {
-
-			cellSize := s.state.AIBoard.Size / float64(board.Cols)
-			col := int((mouseX - s.state.AIBoard.X) / cellSize)
-			row := int((mouseY - s.state.AIBoard.Y) / cellSize)
-
-			if col >= 0 && col < board.Cols && row >= 0 && row < board.Rows {
-				cell := &s.state.AIBoard.Cells[row][col]
-				if cell.State == board.Hit || cell.State == board.Miss {
-					return nil // Já foi atacado
-				}
-
-				s.playerAttempts++
-
-				if cell.State == board.Ship {
-					cell.State = board.Hit
-					s.playerHits++
-
-					if s.playerHits >= 17 {
-						SwitchTo(NewGameOverScene("Jogador 1"))
-						return nil
-					}
-
-					// Se acertou, pode continuar jogando? Regra padrão: continua.
-					// Se quiser simplificar, troca turno. Vamos trocar turno por enquanto.
-				} else if cell.State == board.Empty {
-					cell.State = board.Miss
-				}
-
-				// Passa a vez para a IA
-				s.isPlayerTurn = false
-
-				// Pequeno delay para a IA jogar (opcional, aqui chamamos direto)
-				go func() {
-					time.Sleep(500 * time.Millisecond)
-					s.aiTurn()
-					s.isPlayerTurn = true
-				}()
-			}
-		}
+	frames, delays, _ := assets.LoadFireAnimation()
+	hit, _ := assets.LoadHitImage()
+	miss, _ := assets.LoadMissImage()
+	if hit == nil && len(frames) > 0 {
+		hit = frames[0]
 	}
-	return nil
-}
+	s.fireFrames = frames
+	s.fireDelays = delays
+	s.hitImage = hit
+	s.missImage = miss
 
-func (s *BattleScene) aiTurn() {
-	if s.aiPlayer == nil {
-		return
-	}
+	playerBaseX := playerBoard.X
+	playerBaseY := playerBoard.Y + playerBoard.Size + 20
 
-	s.aiAttempts++
-	// AI ataca o board "entity"
-	// O método Attack da AI modifica o board e o estado interno da AI
-	s.aiPlayer.Attack(s.entityBoard)
+	aiBaseX := aiBoard.X
+	aiBaseY := aiBoard.Y + aiBoard.Size + 20
 
-	// Sincronizar de volta para o board visual
-	for r := 0; r < board.Rows; r++ {
-		for c := 0; c < board.Cols; c++ {
-			entPos := s.entityBoard.Positions[r][c]
-			cell := &s.state.PlayerBoard.Cells[r][c]
-
-			// Se a posição foi atacada na AI mas ainda não no visual, atualize
-			if entity.IsAttacked(entPos) && cell.State != board.Hit && cell.State != board.Miss {
-				if cell.State == board.Ship {
-					cell.State = board.Hit
-					s.aiHits++
-					if s.aiHits >= 17 {
-						SwitchTo(NewGameOverScene("Jogador 2"))
-						return
-					}
-				} else {
-					cell.State = board.Miss
-				}
-			}
-		}
-	}
-}
-
-func (s *BattleScene) initAI() {
-	// 1. Criar Fleet da entity baseado nos playerShips
-	s.entityFleet = entity.NewFleet()
-	// Nota: entity.NewFleet cria navios padrão. Precisamos garantir que correspondam.
-	// O NewFleet cria: Porta-Aviões(6), Navio de Guerra(4), Encouraçado(3), Encouraçado(3), Submarino(1)
-	// Meus shipSizes em setup_utils: 6, 4, 3, 3, 1. Bateu!
-
-	// 2. Criar Board da entity e posicionar navios
-	s.entityBoard = &entity.Board{}
-
-	// Mapear ships do jogo para ships da entity
-	// Assumindo ordem fixa: 0=Size 6, 1=Size 4, 2=Size 3, 3=Size 3, 4=Size 1
-	// Vamos iterar e encontrar correspondentes
-
-	// Para simplificar, vamos limpar o board e reposicionar baseado no s.playerShips
-	// Precisamos saber qual navio é qual.
-	// s.playerShips tem Size e Orientation e Pos.
-
-	usedShips := make(map[int]bool)
-
-	for _, ps := range s.playerShips {
-		if !ps.Placed {
-			continue
-		}
-
-		// Encontrar um navio disponível na fleet com mesmo tamanho
-		var entShip *entity.Ship
-		for i, s := range s.entityFleet.Ships {
-			if !usedShips[i] && s.Size == ps.Size {
-				entShip = s
-				usedShips[i] = true
-				break
-			}
-		}
-
-		if entShip != nil {
-			// Configurar orientação
-			entShip.Horizontal = (ps.Orientation == board.Horizontal)
-
-			// Posicionar no board
-			// PlaceShip da entity espera ponteiro de Ship e atualiza as posições
-			// ATENÇÃO: PlaceShip espera (ship, row, col). ps.Y é Row, ps.X é Col.
-			s.entityBoard.PlaceShip(entShip, ps.Y, ps.X)
-		}
-	}
-
-	// 3. Inicializar AI Player (Hard para usar estratégias melhores)
-	s.aiPlayer = ai.NewHardAIPlayer(s.entityFleet)
-}
-
-func (s *BattleScene) Draw(screen *ebiten.Image) {
-	// Desenha os tabuleiros
-	s.state.PlayerBoard.Draw(screen)
-	s.state.AIBoard.Draw(screen)
-
-	// Linha vertical separando os tabuleiros
-	lineX := 640.0 // Centro da tela
-	lineY1 := s.state.PlayerBoard.Y
-	lineY2 := s.state.PlayerBoard.Y + s.state.PlayerBoard.Size
-	ebitenutil.DrawLine(screen, lineX, lineY1, lineX, lineY2, colors.White)
-
-	// Desenha infos completas
-	s.drawPlayerInfo(screen, s.state.PlayerBoard, "Jogador 1", s.playerAttempts, s.playerHits, s.isPlayerTurn)
-	s.drawPlayerInfo(screen, s.state.AIBoard, "Jogador 2", s.aiAttempts, s.aiHits, !s.isPlayerTurn)
-
-	// Desenha o botão voltar
-	s.backButtonRow.Draw(screen)
-
-	// Desenha os barcos do jogador
-	cellSize := s.state.PlayerBoard.Size / float64(board.Cols)
-	for _, ship := range s.playerShips {
-		if ship.Placed {
-			x := s.state.PlayerBoard.X + float64(ship.X)*cellSize
-			y := s.state.PlayerBoard.Y + float64(ship.Y)*cellSize
-
-			op := &ebiten.DrawImageOptions{}
-			iw, ih := ship.Image.Size()
-			op.GeoM.Scale(
-				(cellSize*float64(ship.Size))/float64(iw),
-				cellSize/float64(ih),
-			)
-
-			if ship.Orientation == board.Vertical {
-				op.GeoM.Rotate(math.Pi / 2)
-				op.GeoM.Translate(cellSize, 0)
-			}
-
-			op.GeoM.Translate(x, y)
-			screen.DrawImage(ship.Image, op)
-		}
-	}
-
-	// Desenha os acertos/erros no tabuleiro do jogador
-	s.drawMarkers(screen, s.state.PlayerBoard)
-	// Desenha os acertos/erros no tabuleiro da IA
-	s.drawMarkers(screen, s.state.AIBoard)
-}
-
-func (s *BattleScene) drawPlayerInfo(screen *ebiten.Image, b *board.Board, name string, attempts, hits int, isTurn bool) {
-	// Posição base abaixo do tabuleiro
-	baseX := b.X
-	baseY := b.Y + b.Size + 20
-
-	// Indicador de turno (círculo/quadrado)
-	indicatorColor := color.RGBA{255, 0, 0, 255} // Vermelho
-	if isTurn {
-		indicatorColor = color.RGBA{0, 255, 0, 255} // Verde
-	}
-	// Desenha quadrado indicador (alinhado à esquerda)
-	ebitenutil.DrawRect(screen, baseX, baseY, 20, 20, indicatorColor)
-
-	// Nome do Jogador (ao lado do indicador)
-	nameLabel := components.NewText(
-		basic.Point{X: float32(baseX + 30), Y: float32(baseY)},
-		name,
+	s.playerNameLabel = components.NewText(
+		basic.Point{X: float32(playerBaseX + 30), Y: float32(playerBaseY)},
+		"Jogador 1",
 		colors.White,
 		20,
 	)
+	s.playerAttemptsLabel = components.NewText(
+		basic.Point{X: float32(playerBaseX + 30), Y: float32(playerBaseY + 30)},
+		"",
+		colors.White,
+		16,
+	)
+	s.playerHitsLabel = components.NewText(
+		basic.Point{X: float32(playerBaseX + 30), Y: float32(playerBaseY + 55)},
+		"",
+		colors.White,
+		16,
+	)
+
+	s.aiNameLabel = components.NewText(
+		basic.Point{X: float32(aiBaseX + 30), Y: float32(aiBaseY)},
+		"Jogador 2",
+		colors.White,
+		20,
+	)
+	s.aiAttemptsLabel = components.NewText(
+		basic.Point{X: float32(aiBaseX + 30), Y: float32(aiBaseY + 30)},
+		"",
+		colors.White,
+		16,
+	)
+	s.aiHitsLabel = components.NewText(
+		basic.Point{X: float32(aiBaseX + 30), Y: float32(aiBaseY + 55)},
+		"",
+		colors.White,
+		16,
+	)
+}
+
+// OnExit é chamado quando saímos da cena de batalha.
+// Não há limpeza específica necessária aqui.
+func (s *BattleScene) OnExit(next Scene) {}
+
+// Update trata entradas do usuário e delega a lógica de turnos ao serviço.
+// Se algum jogador vencer, a cena muda para a tela de Game Over.
+func (s *BattleScene) Update() error {
+	s.backButtonRow.Update(basic.Point{})
+
+	// Clique do mouse no tabuleiro do inimigo (AI)
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		mx, my := ebiten.CursorPosition()
+		mouseX, mouseY := float64(mx), float64(my)
+
+		// O serviço decide se o clique resultou em vitória imediata
+		winner := s.svc.HandlePlayerClick(mouseX, mouseY)
+		if winner != "" {
+			SwitchTo(NewGameOverScene(winner))
+			return nil
+		}
+	}
+
+	// Atualiza o turno da IA e verifica novamente vitória
+	winner := s.svc.Update()
+	if winner != "" {
+		SwitchTo(NewGameOverScene(winner))
+		return nil
+	}
+
+	return nil
+}
+
+// Draw desenha o estado atual da batalha e o botão de recomeçar.
+func (s *BattleScene) Draw(screen *ebiten.Image) {
+	playerBoard := s.svc.PlayerBoard()
+	aiBoard := s.svc.AIBoard()
+
+	playerBoard.Draw(screen)
+	aiBoard.Draw(screen)
+
+	lineX := 640.0
+	lineY1 := playerBoard.Y
+	lineY2 := playerBoard.Y + playerBoard.Size
+	ebitenutil.DrawLine(screen, lineX, lineY1, lineX, lineY2, colors.White)
+
+	pAttempts, pHits, aiAttempts, aiHits, isPlayerTurn := s.svc.Stats()
+
+	s.drawPlayerInfo(screen, playerBoard, s.playerNameLabel, s.playerAttemptsLabel, s.playerHitsLabel, pAttempts, pHits, isPlayerTurn)
+	s.drawPlayerInfo(screen, aiBoard, s.aiNameLabel, s.aiAttemptsLabel, s.aiHitsLabel, aiAttempts, aiHits, !isPlayerTurn)
+
+	for _, ship := range s.svc.PlayerShips() {
+		if ship.Placed {
+			components.DrawShip(screen, playerBoard, ship, false, ship.Orientation)
+		}
+	}
+
+	s.drawMarkers(screen, playerBoard)
+	s.drawMarkers(screen, aiBoard)
+	s.backButtonRow.Draw(screen)
+}
+
+func (s *BattleScene) drawPlayerInfo(
+	screen *ebiten.Image,
+	b *board.Board,
+	nameLabel *components.Text,
+	attemptsLabel *components.Text,
+	hitsLabel *components.Text,
+	attempts int,
+	hits int,
+	isTurn bool,
+) {
+	baseX := b.X
+	baseY := b.Y + b.Size + 20
+
+	indicatorColor := color.RGBA{255, 0, 0, 255}
+	if isTurn {
+		indicatorColor = color.RGBA{0, 255, 0, 255}
+	}
+
+	ebitenutil.DrawRect(screen, baseX, baseY, 20, 20, indicatorColor)
+
 	nameLabel.Draw(screen)
 
-	// Tentativas (alinhado com o indicador/início do tabuleiro)
-	attemptsText := fmt.Sprintf("Tentativa: %d", attempts)
-	attemptsLabel := components.NewText(
-		basic.Point{X: float32(baseX + 30), Y: float32(baseY + 30)},
-		attemptsText,
-		colors.White,
-		16,
-	)
+	attemptsLabel.Text = fmt.Sprintf("Tentativa: %d", attempts)
 	attemptsLabel.Draw(screen)
 
-	// Acertos (alinhado com o indicador/início do tabuleiro)
-	hitsText := fmt.Sprintf("Acertos: %d", hits)
-	hitsLabel := components.NewText(
-		basic.Point{X: float32(baseX + 30), Y: float32(baseY + 55)},
-		hitsText,
-		colors.White,
-		16,
-	)
+	hitsLabel.Text = fmt.Sprintf("Acertos: %d", hits)
 	hitsLabel.Draw(screen)
 }
 
@@ -357,15 +246,13 @@ func (s *BattleScene) drawMarkers(screen *ebiten.Image, b *board.Board) {
 
 				if cell.State == board.Hit {
 					var img *ebiten.Image
-					if len(s.fireFrames) > 0 {
-						// Calcular frame baseado no tempo
-						// Assumindo 10ms por unidade de delay (padrão GIF)
+					if len(s.fireFrames) > 0 && len(s.fireDelays) == len(s.fireFrames) {
 						totalDuration := 0
 						for _, d := range s.fireDelays {
-							totalDuration += d * 10 // delay em centésimos de segundo -> ms
+							totalDuration += d * 10
 						}
 						if totalDuration == 0 {
-							totalDuration = 100 // fallback
+							totalDuration = 100
 						}
 
 						now := int(time.Now().UnixMilli())
@@ -376,7 +263,7 @@ func (s *BattleScene) drawMarkers(screen *ebiten.Image, b *board.Board) {
 							frameDuration := d * 10
 							if frameDuration == 0 {
 								frameDuration = 100
-							} // fallback para delay 0
+							}
 							if cycleTime < currentDuration+frameDuration {
 								img = s.fireFrames[k]
 								break
@@ -397,7 +284,6 @@ func (s *BattleScene) drawMarkers(screen *ebiten.Image, b *board.Board) {
 						op.GeoM.Translate(x, y)
 						screen.DrawImage(img, op)
 					} else {
-						// Fallback cor vermelha
 						ebitenutil.DrawRect(screen, x+cellSize*0.25, y+cellSize*0.25, cellSize*0.5, cellSize*0.5, color.RGBA{255, 0, 0, 150})
 					}
 				} else if cell.State == board.Miss && s.missImage != nil {
@@ -407,7 +293,6 @@ func (s *BattleScene) drawMarkers(screen *ebiten.Image, b *board.Board) {
 					op.GeoM.Translate(x, y)
 					screen.DrawImage(s.missImage, op)
 				} else {
-					// Fallback
 					c := color.RGBA{200, 200, 200, 150}
 					if cell.State == board.Hit {
 						c = color.RGBA{255, 0, 0, 150}

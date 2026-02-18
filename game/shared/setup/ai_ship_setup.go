@@ -2,7 +2,6 @@ package setup
 
 import (
 	"math/rand"
-	"time"
 
 	"github.com/allanjose001/go-battleship/game/shared/board"
 )
@@ -11,7 +10,6 @@ import (
 // Útil para configurar o tabuleiro da IA.
 func RandomlyPlaceAIShips(b *board.Board) {
 	b.Clear()
-	rand.Seed(time.Now().UnixNano())
 
 	shipSizes := []int{6, 4, 3, 3, 1} // Mesmos tamanhos do jogador
 

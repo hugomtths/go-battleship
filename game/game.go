@@ -25,6 +25,10 @@ func NewGame() *Game {
 		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}), //incializa com primeira scene
 	}
 
+	scenes.SwitchTo = func(next scenes.Scene) {
+		g.stack.Replace(next)
+	}
+
 	return g
 
 	// 1. Inicializa o estado global do jogo (onde ficam os dados de tabuleiros, etc)
