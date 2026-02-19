@@ -1,0 +1,130 @@
+[
+  {
+    "username": "malub",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "mata marara",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "tereza",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "carlos",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "carina",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "paula silva",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "alcielma",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  },
+  {
+    "username": "cala maria da sila ",
+    "player_stats": {
+      "matches": 0,
+      "wins": 0,
+      "total_shots": 0,
+      "total_hits": 0,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 0,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": null,
+    "history": null
+  }
+]
