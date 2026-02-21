@@ -30,3 +30,7 @@ go.work.sum
 # Editor/IDE
 .idea/
 .vscode/
+
+#arquivos para NÃO COMMITAR !!!!
+cmd/battleship/main.go
+game/game.go
