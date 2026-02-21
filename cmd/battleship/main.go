@@ -1,41 +1,20 @@
 package main
 
 import (
-	"log"
-
 	"github.com/allanjose001/go-battleship/game"
-	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/internal/bootstrap"
-	"github.com/allanjose001/go-battleship/internal/entity"
-	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
+
 	bootstrap.InitRandom()
 
-	// 1. Setup de dados do Perfil
-	profile := entity.Profile{Username: "malub"}
-
-	_ = service.SaveProfile(profile)
-
-	// 2. Recursos Visuais
-	components.InitFonts() // Carrega Goldman.ttf para o NewText funcionar
-
-	// 3. Inicializa o Jogo
 	g := game.NewGame()
-
-	// 4. Configuração de Janela e Resolução Lógica
-	ebiten.SetWindowSize(1280, 720)
-
-	// SetWindowTitle ajuda a identificar a tela de teste
-	ebiten.SetWindowTitle("Batalha Naval - Profile Scene Debug")
-
-	// Habilitar redimensionamento sem quebrar o layout (usa o Layout() do game.go)
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
-	// 5. Execucao do Loop principal
-	if err := ebiten.RunGame(g); err != nil {
-		log.Fatal(err)
+	err := ebiten.RunGame(g)
+	if err != nil {
+		panic(err)
 	}
 }
