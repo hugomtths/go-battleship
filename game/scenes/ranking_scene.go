@@ -37,27 +37,6 @@ func calculateRankingHeight(screenSize basic.Size) float32 {
 	return screenSize.H * float32(0.5)
 }
 
-func calculateSpacerHeight(screenSize basic.Size, rankingHeight float32) float32 {
-	titleHeight := float32(80)
-	paginationHeight := float32(60)
-	backHeight := float32(80)
-
-	spacing := float32(15 * 4)
-
-	free := screenSize.H -
-		titleHeight -
-		rankingHeight -
-		paginationHeight -
-		backHeight -
-		spacing
-
-	if free < 0 {
-		free = 0
-	}
-
-	return free
-}
-
 func (m *RankingScene) init(screenSize basic.Size) {
 
 	itemsPerPage := 3
@@ -106,7 +85,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 	
 	title := components.NewContainer(
 		basic.Point{},
-		basic.Size{W: screenSize.W, H: 80},
+		basic.Size{W: screenSize.W, H: 60}, // Reduzido levemente a altura do container
 		0,
 		nil,
 		basic.Center,
@@ -138,7 +117,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Point{},
 		10,
 		basic.Size{W: screenSize.W, H: rankingHeight},
-		basic.Start,
+		basic.Center, // Alterado para Center
 		basic.Center,
 		cards,
 	)
@@ -148,21 +127,9 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Size{W: screenSize.W, H: rankingHeight},
 		0,
 		nil,
-		basic.Start,
+		basic.Center, // Alterado para Center
 		basic.Center,
 		cardsColumn,
-	)
-
-	spacerHeight := calculateSpacerHeight(screenSize, rankingHeight)
-
-	spacer := components.NewContainer(
-		basic.Point{},
-		basic.Size{W: screenSize.W, H: spacerHeight},
-		0,
-		nil,
-		basic.Center,
-		basic.Center,
-		nil,
 	)
 
 	previousButton := components.NewButton(
@@ -185,7 +152,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	pagRow := components.NewRow(
 		basic.Point{},
-		20,
+		10, // Aproximado (era 20)
 		basic.Size{W: screenSize.W, H: 40},
 		basic.Center,
 		basic.Center,
@@ -194,17 +161,17 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	paginationContainer := components.NewContainer(
 		basic.Point{},
-		basic.Size{W: screenSize.W, H: 60},
+		basic.Size{W: screenSize.W, H: 50},
 		0,
 		nil,
-		basic.Start,
+		basic.Center, // Alterado para Center
 		basic.Center,
 		pagRow,
 	)
 
 	backButton := components.NewContainer(
 		basic.Point{},
-		basic.Size{W: screenSize.W, H: 80},
+		basic.Size{W: screenSize.W, H: 60}, // Reduzido para aproximar
 		0,
 		nil,
 		basic.Center,
@@ -221,19 +188,18 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		),
 	)
 
+	// LAYOUT FINAL CENTRALIZADO
 	m.layout = components.NewColumn(
 		basic.Point{},
-		15,
+		10, // Espaçamento fixo entre os blocos (Título, Ranking, Paginação, Botão)
 		basic.Size{W: screenSize.W, H: screenSize.H},
-		basic.Start,
-		basic.Center,
+		basic.Center, // Centraliza na Vertical
+		basic.Center, // Centraliza na Horizontal
 		[]components.Widget{
 			title,
 			rankingContainer,
-			spacer,
 			paginationContainer,
 			backButton,
 		},
 	)
 }
-
