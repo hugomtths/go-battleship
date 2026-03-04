@@ -47,6 +47,11 @@ func NewButton(
 
 	bt.makeBody() //cria body com body e variaveis de button
 
+	if cb == nil {
+		bt.disabled = true
+		bt.body.SetColor(bt.disabledColor)
+	}
+
 	return bt
 }
 
@@ -129,6 +134,10 @@ func (b *Button) makeBody() {
 
 // Hover verifica se o mouse está sob o botão e muda cor do botão caso sim
 func (b *Button) hoverVerify(mouseX, mouseY int) {
+	if b.disabled {
+		return
+	}
+
 	b.hovered = inputhelper.IsHovered(mouseX, mouseY, b.currentPos, b.size)
 
 	if b.hovered {
@@ -140,6 +149,10 @@ func (b *Button) hoverVerify(mouseX, mouseY int) {
 
 // clickVerify verifica se botão foi clickado e chama CallBack caso sim
 func (b *Button) clickVerify(mouseX, mouseY int) {
+	if b.disabled {
+		return
+	}
+
 	b.clicked = inputhelper.IsClicked(mouseX, mouseY, b.currentPos, b.GetSize())
 
 	if b.clicked && b.CallBack != nil {

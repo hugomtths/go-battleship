@@ -33,6 +33,10 @@ func (m *RankingScene) Draw(screen *ebiten.Image) {
 	}
 }
 
+func calculateRankingHeight(screenSize basic.Size) float32 {
+	return screenSize.H * float32(0.5)
+}
+
 func (m *RankingScene) init(screenSize basic.Size) {
 
 	itemsPerPage := 3
@@ -50,10 +54,52 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	pagePlayers := allPlayers[start:end]
 
-	var sceneWidgets []components.Widget
+	hasPrevious := m.currentPage > 0
+	hasNext := end < len(allPlayers)
 
-	sceneWidgets = append(
-		sceneWidgets,
+	var previousHandler func(*components.Button)
+	var nextHandler func(*components.Button)
+
+	prevColor := colors.Dark
+	nextColor := colors.Dark
+
+	if hasPrevious {
+		previousHandler = func(bt *components.Button) {
+			m.currentPage--
+			m.init(screenSize)
+		}
+	} else {
+		previousHandler = nil
+		prevColor = colors.NightBlue
+	}
+
+	if hasNext {
+		nextHandler = func(bt *components.Button) {
+			m.currentPage++
+			m.init(screenSize)
+		}
+	} else {
+		nextHandler = nil
+		nextColor = colors.NightBlue
+	}
+
+	topSpacer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: screenSize.H * 0.1},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
+		nil,
+	)
+
+	title := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: 60},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
 		components.NewText(
 			basic.Point{},
 			"Ranking",
@@ -62,6 +108,9 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		),
 	)
 
+	rankingHeight := calculateRankingHeight(screenSize)
+
+	var cards []components.Widget
 	for i, player := range pagePlayers {
 		card := components.NewStatCard(
 			basic.Point{},
@@ -71,74 +120,76 @@ func (m *RankingScene) init(screenSize basic.Size) {
 			player.Username,
 			start+i+1,
 		)
-		sceneWidgets = append(sceneWidgets, card)
+		cards = append(cards, card)
 	}
 
-	var paginationButtons []components.Widget
+	cardsColumn := components.NewColumn(
+		basic.Point{},
+		10,
+		basic.Size{W: screenSize.W, H: rankingHeight},
+		basic.Start, 
+		basic.Center,
+		cards,
+	)
 
-	if m.currentPage > 0 {
-		paginationButtons = append(
-			paginationButtons,
-			components.NewButton(
-				basic.Point{},
-				basic.Size{W: 150, H: 40},
-				"Anterior",
-				colors.Dark,
-				nil,
-				func(bt *components.Button) {
-					m.currentPage--
-					m.init(screenSize)
-				},
-			),
-		)
-	}
+	rankingContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: rankingHeight},
+		0,
+		nil,
+		basic.Start, 
+		basic.Center,
+		cardsColumn,
+	)
 
-	if end < len(allPlayers) {
-		paginationButtons = append(
-			paginationButtons,
-			components.NewButton(
-				basic.Point{},
-				basic.Size{W: 150, H: 40},
-				"Próximo",
-				colors.Dark,
-				nil,
-				func(bt *components.Button) {
-					m.currentPage++
-					m.init(screenSize)
-				},
-			),
-		)
-	}
+	previousButton := components.NewButton(
+		basic.Point{},
+		basic.Size{W: 150, H: 40},
+		"< Anterior",
+		prevColor,
+		nil,
+		previousHandler,
+	)
 
-	if len(paginationButtons) > 0 {
-		pagRow := components.NewRow(
-			basic.Point{},
-			20,
-			basic.Size{},
-			basic.Start,
-			basic.Start,
-			paginationButtons,
-		)
+	nextButton := components.NewButton(
+		basic.Point{},
+		basic.Size{W: 150, H: 40},
+		"Próximo >",
+		nextColor,
+		nil,
+		nextHandler,
+	)
 
-		pagContainer := components.NewContainer(
-			basic.Point{},
-			pagRow.GetSize(),
-			0,
-			nil,
-			basic.Center,
-			basic.Center,
-			pagRow,
-		)
+	pagRow := components.NewRow(
+		basic.Point{},
+		10, 
+		basic.Size{W: screenSize.W, H: 40},
+		basic.Center,
+		basic.Center,
+		[]components.Widget{previousButton, nextButton},
+	)
 
-		sceneWidgets = append(sceneWidgets, pagContainer)
-	}
+	paginationContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: 50},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
+		pagRow,
+	)
 
-	sceneWidgets = append(
-		sceneWidgets,
+	backButton := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: 60},
+		0,
+		nil,
+		basic.Center,
+		basic.Center,
 		components.NewButton(
 			basic.Point{},
 			basic.Size{W: 400, H: 50},
-			"Voltar",
+			"Voltar ao menu",
 			colors.Dark,
 			nil,
 			func(bt *components.Button) {
@@ -149,11 +200,16 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	m.layout = components.NewColumn(
 		basic.Point{},
-		15,
+		15,           
 		basic.Size{W: screenSize.W, H: screenSize.H},
-		basic.Center,
-		basic.Center,
-		sceneWidgets,
+		basic.Start,  
+		basic.Center, 
+		[]components.Widget{
+			topSpacer,
+			title,
+			rankingContainer,
+			paginationContainer,
+			backButton,
+		},
 	)
-
 }
