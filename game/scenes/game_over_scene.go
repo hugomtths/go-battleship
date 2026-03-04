@@ -134,7 +134,7 @@ func (s *GameOverScene) Draw(screen *ebiten.Image) {
 	if s.currentImg != nil {
 		w, _ := s.currentImg.Size()
 		op := &ebiten.DrawImageOptions{}
-		
+
 		// Escala se necessário (opcional)
 		scale := 1.2
 		op.GeoM.Scale(scale, scale)

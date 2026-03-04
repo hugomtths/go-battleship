@@ -20,5 +20,5 @@ func (m MatchResult) FormattedDuration() string {
 	minute := totalSec / 60
 	sec := totalSec % 60
 
-	return fmt.Sprintf("%02d:%02d", minute, sec)
+	return fmt.Sprintf("%02dm:%02ds", minute, sec)
 }

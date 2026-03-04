@@ -11,7 +11,7 @@ import (
 func RandomlyPlaceAIShips(b *board.Board) {
 	b.Clear()
 
-	shipSizes := []int{6, 4, 3, 3, 1} // Mesmos tamanhos do jogador
+	shipSizes := []int{6, 6, 4, 4, 3, 1} // Mesmos tamanhos do jogador
 
 	for _, sz := range shipSizes {
 		for {

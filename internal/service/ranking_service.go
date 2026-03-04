@@ -1,8 +1,8 @@
 package service
 
 import (
-	"sort"
 	"github.com/allanjose001/go-battleship/internal/entity"
+	"sort"
 )
 
 func GetTopScores(limit int) []entity.Profile {

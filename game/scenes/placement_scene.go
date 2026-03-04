@@ -1,7 +1,9 @@
 package scenes
 
 import (
+	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
@@ -81,13 +83,13 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	img3, _, _ := ebitenutil.NewImageFromFile("assets/images/Frame 400.png")
 	img4, _, _ := ebitenutil.NewImageFromFile("assets/images/NAVIO 4 SLOTS 1.png")
 
-	// Cria a lista de navios disponíveis na lateral direita
 	ships := []*placement.ShipPlacement{
 		{Image: img3, Size: 6, ListX: 800, ListY: 100},
-		{Image: img4, Size: 4, ListX: 800, ListY: 180},
-		{Image: img2, Size: 3, ListX: 800, ListY: 240},
-		{Image: img2, Size: 3, ListX: 800, ListY: 300},
-		{Image: img1, Size: 1, ListX: 800, ListY: 360},
+		{Image: img3, Size: 6, ListX: 800, ListY: 160},
+		{Image: img4, Size: 4, ListX: 800, ListY: 250},
+		{Image: img4, Size: 4, ListX: 800, ListY: 320},
+		{Image: img2, Size: 3, ListX: 800, ListY: 380},
+		{Image: img1, Size: 1, ListX: 800, ListY: 440},
 	}
 
 	s.board = b
@@ -99,6 +101,18 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	// Cores dos botões
 	btnColor := color.RGBA{48, 67, 103, 255}
 	playBtnColor := color.RGBA{60, 120, 60, 255}
+
+	// Botão Voltar
+	backButton := components.NewButton(
+		basic.Point{},
+		basic.Size{W: 120, H: 50},
+		"Voltar",
+		btnColor,
+		colors.White,
+		func(b *components.Button) {
+			s.stack.Pop()
+		},
+	)
 
 	// Botão para iniciar a batalha. Só funciona se todos os navios
 	// tiverem sido posicionados no tabuleiro.
@@ -115,11 +129,22 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 
 			factory := service.NewGameService()
 			gs := factory.NewBattleGameState(s.board, s.ships)
-			if s.playerProfile != nil {
-				SwitchTo(NewBattleSceneWithPlayer(gs, s.playerProfile))
-			} else {
-				SwitchTo(NewBattleScene(gs))
+
+			matchID := fmt.Sprintf("match-%d", time.Now().UnixNano())
+			match := entity.NewMatch(matchID, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile)
+
+			svc, err := service.NewBattleServiceFromMatch(match)
+			if err != nil {
+				fmt.Println("Erro ao criar serviço de batalha:", err)
+				return
 			}
+
+			if s.ctx != nil {
+				s.ctx.SetMatch(match)
+				s.ctx.SetBattleService(svc)
+			}
+
+			SwitchTo(NewBattleScene())
 		},
 	)
 
@@ -170,23 +195,29 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	}
 	rightRow := components.NewRow(
 		basic.Point{},
-		0,
-		basic.Size{W: 200, H: 50},
+		20, // Espaçamento entre botões
+		basic.Size{W: 300, H: 50},
 		basic.Center,
 		basic.Center,
 		[]components.Widget{
+			backButton,
 			s.playButton,
 		},
 	)
 	s.rightButtons = components.NewContainer(
-		basic.Point{X: float32(minListX), Y: float32(y + sizeX + 80)},
-		basic.Size{W: 200, H: 50},
+		basic.Point{X: float32(minListX) - 40, Y: float32(y + sizeX + 80)}, // Ajuste X para caber melhor
+		basic.Size{W: 300, H: 50},
 		25,
 		nil,
 		basic.Center,
 		basic.Center,
 		rightRow,
 	)
+
+	// Tenta recuperar profile do contexto se não tiver sido passado
+	if s.playerProfile == nil && s.ctx != nil && s.ctx.Profile != nil {
+		s.playerProfile = s.ctx.Profile
+	}
 
 	// Cria o rótulo com o nome do jogador
 	labelText := "Jogador 1"

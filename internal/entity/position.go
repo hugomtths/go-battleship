@@ -43,5 +43,5 @@ func GetShipReference(pos Position) *Ship {
 }
 
 func IsValidPosition(pos Position) bool {
-    return !pos.attacked && !pos.blocked && pos.shipReference == nil
+	return !pos.attacked && !pos.blocked && pos.shipReference == nil
 }

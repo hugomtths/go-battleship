@@ -1,10 +1,7 @@
 package service
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/allanjose001/go-battleship/game/shared/board"
@@ -38,23 +35,16 @@ var (
 	ErrMatchNotReady = errors.New("match runtime references not set")
 )
 
-// MatchService orquestra a partida em memória (turnos/agenda/streaks) e
-// persiste APENAS o resultado final (MatchResult) em arquivo JSON.
-//
-// - Não persiste Match em si (porque Boards/IA não são serializáveis).
-// - O arquivo JSON armazena uma lista de MatchResult (histórico global).
 type MatchService struct {
-	repo    *matchResultRepository
 	attack  *AttackService
 	aiDelay time.Duration
 }
 
 // NewMatchService cria um MatchService.
 //
-// storageFile: caminho do arquivo JSON de resultados (ex.: "internal/data/match_results.json").
 // attack: pode ser nil; se nil, usa NewAttackService().
 // aiDelay: delay mínimo entre ataques da IA; se <= 0, usa 1s.
-func NewMatchService(storageFile string, attack *AttackService, aiDelay time.Duration) *MatchService {
+func NewMatchService(attack *AttackService, aiDelay time.Duration) *MatchService {
 	if aiDelay <= 0 {
 		aiDelay = time.Second
 	}
@@ -62,7 +52,6 @@ func NewMatchService(storageFile string, attack *AttackService, aiDelay time.Dur
 		attack = NewAttackService()
 	}
 	return &MatchService{
-		repo:    &matchResultRepository{file: storageFile},
 		attack:  attack,
 		aiDelay: aiDelay,
 	}
@@ -71,7 +60,7 @@ func NewMatchService(storageFile string, attack *AttackService, aiDelay time.Dur
 // Create cria um Match em memória.
 // Como o Match não é persistido, este método apenas devolve um novo Match.
 func (s *MatchService) Create(id string) *entity.Match {
-	return entity.NewMatch(id)
+	return entity.NewMatch(id, nil, nil, nil, nil)
 }
 
 // Start inicializa o Match e injeta referências runtime necessárias para jogar.
@@ -213,7 +202,7 @@ func (s *MatchService) applyPlayerAttack(m *entity.Match, row, col int) (hit boo
 func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gameOver bool, ev *entity.AttackEvent) error {
 	if gameOver {
 		s.finishAndFillWinner(m, now, entity.TurnPlayer, ev)
-		return s.repo.appendResult(m.Result())
+		return nil
 	}
 
 	if !hit {
@@ -283,7 +272,7 @@ func (s *MatchService) applyEnemyStep(m *entity.Match, aiPlayer *ai.AIPlayer) (h
 func (s *MatchService) postEnemyStep(m *entity.Match, now time.Time, hit, gameOver bool, ev *entity.AttackEvent) error {
 	if gameOver {
 		s.finishAndFillWinner(m, now, entity.TurnEnemy, ev)
-		return s.repo.appendResult(m.Result())
+		return nil
 	}
 
 	if hit {
@@ -314,65 +303,7 @@ func (s *MatchService) finishAndFillWinner(m *entity.Match, now time.Time, winne
 	ev.Winner = winner
 }
 
-func (s *MatchService) ListResults() ([]entity.MatchResult, error) {
-	return s.repo.loadAll()
-}
-
-//
-// ---------------- repository (JSON simples de MatchResult) ----------------
-//
-
-type matchResultRepository struct {
-	file string
-}
-
-func (r *matchResultRepository) loadAll() ([]entity.MatchResult, error) {
-	b, err := os.ReadFile(r.file)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return []entity.MatchResult{}, nil
-		}
-		return nil, err
-	}
-	if len(b) == 0 {
-		return []entity.MatchResult{}, nil
-	}
-
-	var data []entity.MatchResult
-	if err := json.Unmarshal(b, &data); err != nil {
-		return nil, err
-	}
-	if data == nil {
-		data = []entity.MatchResult{}
-	}
-	return data, nil
-}
-
-func (r *matchResultRepository) saveAll(all []entity.MatchResult) error {
-	dir := filepath.Dir(r.file)
-	if dir != "." && dir != "" {
-		if err := os.MkdirAll(dir, 0o755); err != nil {
-			return err
-		}
-	}
-
-	b, err := json.MarshalIndent(all, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	tmp := r.file + ".tmp"
-	if err := os.WriteFile(tmp, b, 0o644); err != nil {
-		return err
-	}
-	return os.Rename(tmp, r.file)
-}
-
-func (r *matchResultRepository) appendResult(res entity.MatchResult) error {
-	all, err := r.loadAll()
-	if err != nil {
-		return err
-	}
-	all = append(all, res)
-	return r.saveAll(all)
+// ResultForPlayer converte o estado final do Match em MatchResult do ponto de vista do player.
+func (s *MatchService) ResultForPlayer(m *entity.Match) entity.MatchResult {
+	return m.Result()
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/allanjose001/go-battleship/game/shared/board"
+	"github.com/allanjose001/go-battleship/game/shared/placement"
 )
 
 // Regras / estados
@@ -84,20 +85,26 @@ type Match struct {
 	TotalPlayerShipCells int `json:"total_player_ship_cells"`
 
 	// Estado runtime (não persistir)
-	PlayerBoard *board.Board `json:"-"`
-	EnemyBoard  *board.Board `json:"-"`
+	PlayerBoard *board.Board               `json:"-"`
+	EnemyBoard  *board.Board               `json:"-"`
+	PlayerShips []*placement.ShipPlacement `json:"-"`
+	Profile     *Profile                   `json:"-"`
 
 	// Visão lógica do jogador para a IA (entity.Board é o que seu AIPlayer ataca)
 	PlayerEntityBoard *Board `json:"-"`
 	PlayerFleet       *Fleet `json:"-"`
 }
 
-func NewMatch(id string) *Match {
+func NewMatch(id string, playerBoard, aiBoard *board.Board, ships []*placement.ShipPlacement, profile *Profile) *Match {
 	return &Match{
-		ID:     id,
-		Status: MatchStatusWaiting,
-		Turn:   TurnPlayer,
-		Winner: "",
+		ID:          id,
+		Status:      MatchStatusWaiting,
+		Turn:        TurnPlayer,
+		Winner:      "",
+		PlayerBoard: playerBoard,
+		EnemyBoard:  aiBoard,
+		PlayerShips: ships,
+		Profile:     profile,
 	}
 }
 

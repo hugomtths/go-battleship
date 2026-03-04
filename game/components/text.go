@@ -21,7 +21,7 @@ type Text struct {
 	fontSize        int
 }
 
-var GoldmanFont *opentype.Font // carregada uma vez
+var globalFont *opentype.Font // carregada uma vez
 
 func NewText(
 	pos basic.Point,
@@ -43,23 +43,20 @@ func NewText(
 
 // InitFonts carrega fonte (*opentype.Font) no inicio do jogo
 func InitFonts() {
-	data, err := os.ReadFile("assets/fonts/PixelifySans-Bold.ttf")
+	data, err := os.ReadFile("assets/fonts/Retro Gaming.ttf")
 	if err != nil {
-		panic(err)
+		panic("Erro ao ler arquivo ttf: " + err.Error())
 	}
 
-	GoldmanFont, err = opentype.Parse(data)
-	if err != nil {
-		panic(err)
-	}
-	if GoldmanFont == nil {
-		panic("Pixelify Sans não inicializada. Chame InitFonts() antes de criar Text.")
+	globalFont, err = opentype.Parse(data)
+	if globalFont == nil {
+		panic("Fonte não inicializada. Chame InitFonts() antes de criar Text.")
 	}
 }
 
 // createFace Cria uma Face de um tamanho específico
 func createFace(size float64) font.Face {
-	face, _ := opentype.NewFace(GoldmanFont, &opentype.FaceOptions{
+	face, _ := opentype.NewFace(globalFont, &opentype.FaceOptions{
 		Size:    size,
 		DPI:     72,
 		Hinting: font.HintingFull,

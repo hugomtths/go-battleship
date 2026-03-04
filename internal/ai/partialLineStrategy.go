@@ -51,4 +51,3 @@ func (s *PartialLineStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool 
 
 	return true
 }
-

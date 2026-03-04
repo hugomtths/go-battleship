@@ -3,162 +3,181 @@ package service
 import (
 	"time"
 
-	"github.com/allanjose001/go-battleship/game/shared/board"
-	"github.com/allanjose001/go-battleship/game/shared/placement"
-	"github.com/allanjose001/go-battleship/game/state"
 	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/allanjose001/go-battleship/internal/entity"
 )
 
-// BattleService concentra toda a lógica da fase de batalha:
-// controle de turno, cliques do jogador, turno da IA e estatísticas.
-type BattleService struct {
-	// state guarda os tabuleiros e dados globais do jogo
-	state       *state.GameState
-	attack      *AttackService
-	battleSetup *BattleSetupService
-	// aiPlayer é a inteligência artificial que decide os tiros da IA
+// BattleService define a interface para interação com a lógica de batalha.
+// Essa abstração permite que a camada de apresentação (Scenes/Components) não conheça
+// os detalhes internos de como a batalha é processada.
+type BattleService interface {
+	// HandlePlayerClick processa a tentativa de ataque do jogador em uma célula (linha, coluna).
+	HandlePlayerClick(row, col int) (*entity.MatchResult, error)
+	// HandleEnemyTurn executa o turno da IA (computador).
+	HandleEnemyTurn() (*entity.MatchResult, error)
+	// Stats retorna as estatísticas atuais da partida (tiros, acertos e de quem é a vez).
+	Stats() (playerShots, playerHits, enemyShots, enemyHits int, isPlayerTurn bool)
+	// WinnerName retorna o nome do vencedor caso a partida tenha terminado.
+	WinnerName() string
+}
+
+// battleService é a implementação concreta da interface BattleService.
+// Ele orquestra o fluxo do jogo usando o MatchService e mantém o estado da partida.
+type battleService struct {
+	// matchSvc é o serviço de domínio que aplica as regras do jogo.
+	matchSvc *MatchService
+	// match mantém o estado atual da partida (tabuleiros, turnos, pontuação).
+	match *entity.Match
+	// aiPlayer é a instância da inteligência artificial que joga contra o humano.
 	aiPlayer *ai.AIPlayer
-	// entityBoard e entityFleet representam a visão interna da IA
-	entityBoard *entity.Board
-	entityFleet *entity.Fleet
-
-	playerShips []*placement.ShipPlacement
-
-	totalShipCells int
-
-	// contadores de tentativas e acertos do jogador e da IA
-	playerAttempts int
-	playerHits     int
-	aiAttempts     int
-	aiHits         int
-
-	// indica de quem é o turno atual
-	isPlayerTurn bool
-
-	// controle de atraso entre o tiro do jogador e o da IA
-	aiTurnPending bool
-	aiTurnAt      time.Time
-
-	// vencedor atual ("", "Jogador 1" ou "Jogador 2")
-	winner string
+	// profile é o perfil do jogador humano, usado para registrar estatísticas de vitória/derrota.
+	profile *entity.Profile
 }
 
-// NewBattleService cria um serviço de batalha baseado em um GameState já existente.
-// Se o GameService não for passado, é criada uma instância padrão.
-func NewBattleService(gs *state.GameState, game *GameService, playerShips []*placement.ShipPlacement) *BattleService {
-	b := &BattleService{
-		state:        gs,
-		playerShips:  playerShips,
-		attack:       NewAttackService(),
-		battleSetup:  NewBattleSetupService(),
-		isPlayerTurn: true,
-	}
+// NewBattleServiceFromMatch inicializa o serviço a partir de um Match existente no contexto.
+// Se o Match ainda não foi inicializado (runtime), ele configura a IA e inicia o jogo.
+func NewBattleServiceFromMatch(match *entity.Match) (BattleService, error) {
+	// Cria o serviço de setup (para IA) e o serviço de partida (regras)
+	setupSvc := NewBattleSetupService()
+	matchSvc := NewMatchService(nil, 500*time.Millisecond)
 
-	b.totalShipCells = calculateTotalCells(playerShips)
+	var aiPlayer *ai.AIPlayer
 
-	b.aiPlayer, b.entityBoard, b.entityFleet = b.battleSetup.InitBattleAI(playerShips)
+	// Se PlayerEntityBoard for nil, significa que a IA ainda não foi configurada para este Match.
+	if match.PlayerEntityBoard == nil {
+		// Inicializa a IA, criando o tabuleiro lógico e a frota da IA
+		var entityBoard *entity.Board
+		var fleet *entity.Fleet
+		aiPlayer, entityBoard, fleet = setupSvc.InitBattleAI(match.PlayerShips)
 
-	return b
-}
-
-// HandlePlayerClick trata o clique do jogador no tabuleiro da IA.
-// Converte a posição do mouse em célula, aplica o ataque e atualiza o turno.
-// Retorna o nome do vencedor (caso a jogada finalize a partida).
-func (b *BattleService) HandlePlayerClick(mouseX, mouseY float64) string {
-	if !b.isPlayerTurn || b.winner != "" {
-		return b.winner
-	}
-
-	aiBoard := b.state.AIBoard
-
-	// Ignora cliques fora da área do tabuleiro da IA
-	if mouseX < aiBoard.X || mouseX > aiBoard.X+aiBoard.Size || mouseY < aiBoard.Y || mouseY > aiBoard.Y+aiBoard.Size {
-		return b.winner
-	}
-
-	// Traduz coordenadas de tela para linha/coluna do tabuleiro
-	cellSize := aiBoard.Size / float64(board.Cols)
-	col := int((mouseX - aiBoard.X) / cellSize)
-	row := int((mouseY - aiBoard.Y) / cellSize)
-
-	if col < 0 || col >= board.Cols || row < 0 || row >= board.Rows {
-		return b.winner
-	}
-
-	var gameOver bool
-
-	b.playerAttempts, b.playerHits, _, gameOver = b.attack.PlayerAttack(aiBoard, row, col, b.playerAttempts, b.playerHits, b.totalShipCells)
-
-	if gameOver {
-		b.winner = "Jogador 1"
-		return b.winner
-	}
-
-	// Passa o turno para a IA com um pequeno atraso visual
-	b.isPlayerTurn = false
-	b.aiTurnPending = true
-	b.aiTurnAt = time.Now().Add(500 * time.Millisecond)
-
-	return b.winner
-}
-
-// Update processa o turno da IA quando for a vez dela jogar.
-// Também verifica se a partida terminou.
-func (b *BattleService) Update() string {
-	if b.winner != "" {
-		return b.winner
-	}
-
-	if b.aiTurnPending && time.Now().After(b.aiTurnAt) {
-		b.aiTurnPending = false
-
-		// Se algo falhar na inicialização da IA, devolve o turno ao jogador
-		if b.aiPlayer == nil || b.entityBoard == nil {
-			b.isPlayerTurn = true
-			return b.winner
+		// Calcula o total de células ocupadas por navios do jogador (vida do player)
+		totalCells := 0
+		for _, ship := range match.PlayerShips {
+			if ship != nil {
+				totalCells += ship.Size
+			}
 		}
 
-		var gameOver bool
-
-		b.aiAttempts, b.aiHits, gameOver = b.attack.AITurn(b.aiPlayer, b.entityBoard, b.state.PlayerBoard, b.aiAttempts, b.aiHits, b.totalShipCells)
-
-		if gameOver {
-			b.winner = "Jogador 2"
-			return b.winner
+		// Inicia a partida (Start) para configurar os ponteiros runtime no Match e mudar status para InProgress
+		// Note que passamos match.PlayerBoard e match.EnemyBoard que vieram do PlacementScene
+		if err := matchSvc.Start(
+			match,
+			time.Now(),
+			match.PlayerBoard,
+			match.EnemyBoard,
+			entityBoard,
+			fleet,
+			totalCells, // Vida do Player
+			totalCells, // Vida da IA (simétrica)
+		); err != nil {
+			return nil, err
 		}
-
-		// Terminado o turno da IA, devolve o turno ao jogador
-		b.isPlayerTurn = true
+	} else {
+		// Se já existe PlayerEntityBoard, estamos retomando um Match (ex: persistência futura).
+		// Precisamos recriar o AIPlayer com a frota existente.
+		// OBS: Se a IA tiver estado interno complexo (memória de tiros), precisaria ser restaurado aqui.
+		// Por enquanto, recriamos com a frota salva no Match.
+		aiPlayer = ai.NewHardAIPlayer(match.PlayerFleet)
 	}
 
-	return b.winner
+	return &battleService{
+		matchSvc: matchSvc,
+		match:    match,
+		aiPlayer: aiPlayer,
+		profile:  match.Profile,
+	}, nil
 }
 
-// Stats retorna estatísticas básicas da partida e se é turno do jogador.
-func (b *BattleService) Stats() (int, int, int, int, bool) {
-	return b.playerAttempts, b.playerHits, b.aiAttempts, b.aiHits, b.isPlayerTurn
-}
-
-// PlayerBoard retorna o tabuleiro do jogador.
-func (b *BattleService) PlayerBoard() *board.Board {
-	return b.state.PlayerBoard
-}
-
-// AIBoard retorna o tabuleiro da IA.
-func (b *BattleService) AIBoard() *board.Board {
-	return b.state.AIBoard
-}
-
-func (b *BattleService) PlayerShips() []*placement.ShipPlacement {
-	return b.playerShips
-}
-func calculateTotalCells(ships []*placement.ShipPlacement) int {
-	total := 0
-	for _, s := range ships {
-		if s != nil {
-			total += s.Size
-		}
+// HandlePlayerClick processa a interação do jogador ao clicar no tabuleiro inimigo.
+func (s *battleService) HandlePlayerClick(row, col int) (*entity.MatchResult, error) {
+	// Verifica se a partida foi inicializada corretamente.
+	if s.matchSvc == nil || s.match == nil {
+		return nil, ErrMatchNotReady
 	}
-	return total
+
+	// Solicita ao serviço de domínio que processe o ataque do jogador.
+	ev, err := s.matchSvc.PlayerAttack(s.match, time.Now(), row, col)
+	if err != nil {
+		return nil, err
+	}
+
+	// Se o ataque resultou em Game Over, processa o fim de jogo.
+	if ev.GameOver {
+		// Gera o resultado final da partida.
+		res := s.matchSvc.ResultForPlayer(s.match)
+		// Registra o resultado no perfil do jogador (se existir).
+		if s.profile != nil {
+			_, _ = AddMatchToProfile(s.profile, res)
+		}
+		return &res, nil
+	}
+
+	// Retorna nil se o jogo continua.
+	return nil, nil
+}
+
+// HandleEnemyTurn executa a lógica de ataque da IA.
+func (s *battleService) HandleEnemyTurn() (*entity.MatchResult, error) {
+	// Verifica pré-condições.
+	if s.matchSvc == nil || s.match == nil || s.aiPlayer == nil {
+		return nil, ErrMatchNotReady
+	}
+
+	// Executa um passo da IA (pode não fazer nada se não for a vez dela ou se estiver em delay).
+	ev, err := s.matchSvc.EnemyAttackStep(s.match, time.Now(), s.aiPlayer)
+	if err != nil {
+		// Ignora erros esperados que indicam que a IA ainda não deve agir.
+		if err == ErrActionNotReady ||
+			err == ErrNoEnemyAttackSched ||
+			err == ErrMatchNotInProgress ||
+			err == ErrMatchFinished {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	// Se a IA venceu, processa o fim de jogo.
+	if ev.GameOver {
+		res := s.matchSvc.ResultForPlayer(s.match)
+		if s.profile != nil {
+			_, _ = AddMatchToProfile(s.profile, res)
+		}
+		return &res, nil
+	}
+
+	return nil, nil
+}
+
+// Stats retorna um resumo do estado atual da partida para exibição no HUD.
+func (s *battleService) Stats() (playerShots, playerHits, enemyShots, enemyHits int, isPlayerTurn bool) {
+	if s.match == nil {
+		return 0, 0, 0, 0, true
+	}
+
+	// Extrai dados diretos da struct Match.
+	return s.match.PlayerShots,
+		s.match.PlayerHits,
+		s.match.EnemyShots,
+		s.match.EnemyHits,
+		s.match.Turn == entity.TurnPlayer
+}
+
+// WinnerName retorna o nome de quem venceu a partida.
+func (s *battleService) WinnerName() string {
+	if s.matchSvc == nil || s.match == nil {
+		return ""
+	}
+
+	// Obtém o resultado final.
+	res := s.matchSvc.ResultForPlayer(s.match)
+	if res.Win {
+		// Se o jogador venceu, retorna seu nome de perfil ou um padrão.
+		if s.profile != nil && s.profile.Username != "" {
+			return s.profile.Username
+		}
+		return "Jogador"
+	}
+
+	// Caso contrário, a IA venceu.
+	return "IA_MAR"
 }

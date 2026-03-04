@@ -40,7 +40,7 @@
       "difficulty_step": {
         "easy": {
           "win": true,
-          "shots_fired": 0,
+          "player_shots": 0,
           "hits": 0,
           "higher_hit_sequence": 0,
           "score": 500,
@@ -56,18 +56,51 @@
   {
     "username": "Luis Henrique",
     "player_stats": {
-      "matches": 0,
-      "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
+      "matches": 3,
+      "wins": 3,
+      "total_shots": 255,
+      "total_hits": 72,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 0,
+      "higher_hit_sequence": 6,
       "faster_time": 0,
       "win_without_losses": false
     },
-    "medals": null,
-    "history": null,
+    "medals": [
+      "Marinheiro"
+    ],
+    "history": [
+      {
+        "win": true,
+        "player_shots": 93,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 6,
+        "killed_ships": 0,
+        "duration": 203908
+      },
+      {
+        "win": true,
+        "player_shots": 64,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 95577
+      },
+      {
+        "win": true,
+        "player_shots": 98,
+        "hits": 24,
+        "higher_hit_sequence": 4,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 174332
+      }
+    ],
     "current_campaign": null,
     "campaigns": null
   },

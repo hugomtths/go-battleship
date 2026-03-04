@@ -108,13 +108,21 @@ func NewStatCard(
 		// Row usa contSize como referência de alinhamento.
 		// O size passado para Row representa o tamanho do pai imediato
 		// que será usado para calcular Center / End.
-		titleWidget = NewRow(
+		titleWidget = NewContainer( //container fantasma para manipular o alinhamento
 			basic.Point{},
-			15,
-			basic.Size{W: contSize.W, H: 40},
+			basic.Size{W: contSize.W * 0.3, H: 40},
+			0,
+			colors.Transparent,
 			basic.Center,
 			basic.Center,
-			[]Widget{rankCircle, nameText},
+			NewRow(
+				basic.Point{},
+				15,
+				basic.Size{W: contSize.W * 0.3, H: 40}, //coloca para se alinhar em 1/3 da largura
+				basic.Start,
+				basic.Center,
+				[]Widget{rankCircle, nameText},
+			),
 		)
 
 	} else {
@@ -223,7 +231,7 @@ func initWidgets(
 				fmt.Sprintf("%d", stats.TotalScore), size),
 			createStatCard("Vitórias",
 				fmt.Sprintf("%d", stats.Wins), size),
-			createStatCard("Maior Sequência de Acertos",
+			createStatCard("Maior Sequência de Hits",
 				fmt.Sprintf("%d", stats.HigherHitSequence), size),
 		}
 	}
@@ -233,9 +241,9 @@ func initWidgets(
 			fmt.Sprintf("%d", stats.Matches), size),
 		createStatCard("Vitórias",
 			fmt.Sprintf("%d", stats.Wins), size),
-		createStatCard("% de Vitória",
+		createStatCard("Winrate",
 			fmt.Sprintf("%.2f %%", stats.WinRate()), size),
-		createStatCard("% de Acertos Média",
+		createStatCard("Hitrate",
 			fmt.Sprintf("%.2f %%", stats.Accuracy()), size),
 		createStatCard("Maior Score",
 			fmt.Sprintf("%d", stats.HighScore), size),

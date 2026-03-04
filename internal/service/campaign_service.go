@@ -75,7 +75,7 @@ func (cs *CampaignService) StartCampaignMatch(
 	return opponent, nil
 }
 
-// HandleCampaignResult processa o fim da partida 
+// HandleCampaignResult processa o fim da partida
 func (cs *CampaignService) HandleCampaignResult(username string, diff string, m *entity.Match) error {
 	profile, err := FindProfile(username)
 	if err != nil {

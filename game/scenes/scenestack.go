@@ -10,18 +10,13 @@ import (
 // partilham de um fluxo)
 type SceneStack struct {
 	stack      []Scene
-	ctx        *state.GameContext
 	screenSize basic.Size
+	ctx        *state.GameContext
 }
 
 // stackAware como Interface interna: cenas que aceitam injeção da stack (para identificar as que usam)
 type stackAware interface {
 	SetStack(*SceneStack)
-}
-
-// contextAware tambem serve para passar context adiante
-type contextAware interface {
-	SetContext(*state.GameContext)
 }
 
 func NewSceneStack(size basic.Size, first Scene, ctx *state.GameContext) *SceneStack {
@@ -33,6 +28,10 @@ func NewSceneStack(size basic.Size, first Scene, ctx *state.GameContext) *SceneS
 
 	s.Push(first)
 	return s
+}
+
+func (s *SceneStack) SetContext(ctx *state.GameContext) {
+	s.ctx = ctx
 }
 
 func (s *SceneStack) IsEmpty() bool {
@@ -53,9 +52,11 @@ func (s *SceneStack) Push(next Scene) {
 		aware.SetStack(s)
 	}
 
-	//mesmo com context
-	if aware, ok := next.(contextAware); ok {
-		aware.SetContext(s.ctx)
+	// injeta contexto se disponível e a cena suportar
+	if s.ctx != nil {
+		if ca, ok := next.(state.ContextAware); ok {
+			ca.SetContext(s.ctx)
+		}
 	}
 
 	var prev Scene
@@ -85,6 +86,12 @@ func (s *SceneStack) Pop() {
 	top.OnExit(next)
 
 	if next != nil {
+		// injeta contexto na próxima também (caso necessário)
+		if s.ctx != nil {
+			if ca, ok := next.(state.ContextAware); ok {
+				ca.SetContext(s.ctx)
+			}
+		}
 		next.OnEnter(top, s.screenSize)
 	}
 }
