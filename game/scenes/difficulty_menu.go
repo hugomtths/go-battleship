@@ -9,7 +9,9 @@ import (
 )
 
 type DifficultyMenu struct {
-	layout components.Widget
+    layout   components.Widget
+    onSelect func(player *ai.AIPlayer)
+    StackHandler
 }
 
 func NewDifficultyMenu(w, h int, onSelect func(player *ai.AIPlayer)) *DifficultyMenu {
@@ -39,17 +41,25 @@ func NewDifficultyMenu(w, h int, onSelect func(player *ai.AIPlayer)) *Difficulty
 			btnRecruta, btnImediato, btnAlmirante,
 		},
 	)
-	return &DifficultyMenu{layout: column}
+	return &DifficultyMenu{layout: column, onSelect: onSelect}
 }
 
+func (m *DifficultyMenu) OnEnter(prev Scene, size basic.Size) {
+    // layout já criado em NewDifficultyMenu; nothing else required
+}
+
+
 func (m *DifficultyMenu) Update() error {
-	m.layout.Update(basic.Point{X: 0, Y: 0})
+    if m.layout != nil {
+        m.layout.Update(basic.Point{X: 0, Y: 0})
+    }
 	return nil
 }
 
 func (m *DifficultyMenu) Draw(screen *ebiten.Image) {
-	screen.Fill(colors.DarkBlue)
-	m.layout.Draw(screen)
+    if m.layout != nil {
+        m.layout.Draw(screen)
+    }
 }
 
 func (m *DifficultyMenu) Layout(w, h int) (int, int) { return w, h }

@@ -175,7 +175,8 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 	// Ícone de jogar
 	playBtn := components.NewPlayIconButton(basic.Point{}, iconSize, func() {
 		s.ctx.Profile = p
-		s.stack.Push(&PlacementScene{})
+		s.stack.Push(&ModeSelectionScene{})
+		//s.stack.Push(&PlacementScene{})
 	})
 
 	// Monta a linha: [delete] [nome] [play]
