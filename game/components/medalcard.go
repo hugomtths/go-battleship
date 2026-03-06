@@ -1,8 +1,6 @@
 package components
 
 import (
-	"image/color"
-
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -12,12 +10,11 @@ import (
 // Ele funciona como um widget composto: toda a renderização real é delegada
 // para o campo `body`, que contém a árvore de containers/layouts internos.
 //
-// TODO: Para medalhas não adquiridas, a ideia é permitir estilização externa
 // (ex: cor diferente) via StylableWidget.
 type MedalCard struct {
 	pos, currentPos basic.Point    // posição base e posição final com offset aplicado
 	size            basic.Size     // tamanho total do card (usado pelo layout pai)
-	body            StylableWidget // widget raiz que contém todo o layout interno
+	body            StylableWidget // widget raiz que contém tod o layout interno
 }
 
 // NewMedal constrói a estrutura completa do card.
@@ -27,10 +24,31 @@ type MedalCard struct {
 //
 // O restante funciona como padding visual.
 func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
-	iconTxt := NewText(basic.Point{}, icon, color.RGBA{255, 200, 0, 255}, 28) // ícone da medalha
-	titleTxt := NewText(basic.Point{}, title, color.RGBA{40, 40, 50, 255}, 16)
-	descTxt := NewText(basic.Point{}, desc, color.RGBA{100, 100, 110, 255}, 12)
 
+	var iconSize basic.Size
+
+	if title == "BLOQUEADA" {
+		iconSize = basic.Size{
+			W: 40,
+			H: 55,
+		}
+	} else {
+		iconSize = basic.Size{
+			W: 40,
+			H: 70,
+		}
+	}
+	iconImage, err := NewImage(icon, basic.Point{}, iconSize)
+	titleTxt := NewText(basic.Point{}, title, colors.GoldMedal, 16)
+	descTxt := NewText(basic.Point{}, desc, colors.GoldMedal, 12)
+
+	var iconHandler Widget //nao vai parar o jogo so por causa de um asset rsrssrs
+
+	if err != nil {
+		iconHandler = NewText(basic.Point{}, "ERROR", colors.Red, 16)
+	} else {
+		iconHandler = iconImage
+	}
 	return &MedalCard{
 		size: size,
 		body: NewContainer( // container pai do card inteiro
@@ -54,7 +72,7 @@ func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
 							H: size.H,
 						},
 						0, colors.Transparent, basic.Center, basic.Center,
-						iconTxt,
+						iconHandler,
 					),
 
 					// Container de texto (título + descrição)

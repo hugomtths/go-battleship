@@ -20,7 +20,7 @@ type ProfileScene struct {
 func (p *ProfileScene) init(size basic.Size) {
 	playerName := p.ctx.Profile.Username
 
-	// Chamamos o método agora vinculado à struct
+	// Chamamos o method agora vinculado à struct
 	medals := p.loadMedals()
 
 	// Coluna principal que centraliza verticalmente
@@ -84,31 +84,20 @@ func (p *ProfileScene) init(size basic.Size) {
 func (p *ProfileScene) loadMedals() *[]components.Widget {
 	var widgets = []components.Widget{}
 
-	// Iteramos sobre a MedalsList oficial do seu medal_repository.go
-	for _, m := range medal.MedalsList {
-
-		// Lógica pedida pelo Cauã:
-		// 1. Verifica se o player atingiu os requisitos
-		isUnlocked := m.Verification(p.ctx.Profile.Stats)
-
-		displayIcon := m.GrayIconPath // Ícone cinza por padrão
+	playerMedalNames := p.ctx.Profile.MedalsNames
+	for i, m := range medal.GetMedals(playerMedalNames) { //isso retorna o array com posicoes preservadas
+		displayIcon := medal.MedalsList[i].GrayIconPath
 		displayTitle := "BLOQUEADA"
-		displayDesc := "???" // Descrição oculta
+		displayDesc := "???"
 
-		// 2. Se conquistou, libera as informações reais
-		if isUnlocked {
+		if m != nil { //posicao vazia = nao teve a medal
 			displayIcon = m.IconPath
 			displayTitle = m.Name
 			displayDesc = m.Description
 		}
 
-		// 3. Adiciona o componente visual real
-		widgets = append(widgets, components.NewMedal(
-			displayIcon,
-			displayTitle,
-			displayDesc,
-			basic.Size{W: 230, H: 90},
-		))
+		medalW := components.NewMedal(displayIcon, displayTitle, displayDesc, basic.Size{W: 230, H: 90})
+		widgets = append(widgets, medalW)
 	}
 
 	return &widgets
