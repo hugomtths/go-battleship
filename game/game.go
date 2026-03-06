@@ -24,7 +24,7 @@ func NewGame() *Game {
 	//inicializa fonte ao inicializar game
 	components.InitFonts()
 	g := &Game{
-		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}, &state.GameContext{}), //incializa com primeira scene
+		stack: scenes.NewSceneStack(windowSize, &scenes.HomeScreen{}, state.NewGameContext()), //incializa com primeira scene
 	}
 
 	scenes.SwitchTo = func(next scenes.Scene) {
