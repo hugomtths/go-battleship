@@ -1,12 +1,9 @@
 package components
 
 import (
-	"image/color"
-
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/game/shared/placement"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 // BattleBoardView é o componente responsável pela visualização do tabuleiro durante a batalha.
@@ -65,61 +62,43 @@ func (v *BattleBoardView) DrawMarkers(screen *ebiten.Image, b *board.Board) {
 		return
 	}
 
-	// Calcula o tamanho visual de cada célula baseado no tamanho total do tabuleiro e número de colunas.
 	cellSize := b.Size / float64(board.Cols)
+	// reutiliza uma única instância de DrawImageOptions — zero alocações por frame
+	op := &ebiten.DrawImageOptions{}
 
-	// Percorre todas as linhas e colunas do grid.
 	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols; j++ {
 			cell := b.Cells[i][j]
 
-			// Verifica se a célula tem um estado de tiro (Hit ou Miss).
-			if cell.State == board.Hit || cell.State == board.Miss {
-				// Calcula a posição X e Y exata para desenhar o marcador nesta célula.
-				x := b.X + float64(j)*cellSize
-				y := b.Y + float64(i)*cellSize
+			if cell.State != board.Hit && cell.State != board.Miss {
+				continue
+			}
 
-				// Lógica para desenhar um Acerto (Hit).
-				if cell.State == board.Hit {
-					var img *ebiten.Image
+			x := b.X + float64(j)*cellSize
+			y := b.Y + float64(i)*cellSize
 
-					// Tenta pegar o quadro atual da animação de fogo.
-					if v.fireAnimation != nil {
-						img = v.fireAnimation.CurrentFrame()
-					}
-					// Se não houver animação ou falhar, usa a imagem estática.
-					if img == nil {
-						img = v.hitImage
-					}
-
-					if img != nil {
-						// Configura as opções de desenho (escala e translação).
-						op := &ebiten.DrawImageOptions{}
-						iw, ih := img.Size()
-						// Ajusta a escala da imagem para caber na célula.
-						op.GeoM.Scale(cellSize/float64(iw), cellSize/float64(ih))
-						// Move a imagem para a posição correta.
-						op.GeoM.Translate(x, y)
-						screen.DrawImage(img, op)
-					} else {
-						// Fallback: se não houver imagem nenhuma, desenha um quadrado vermelho.
-						ebitenutil.DrawRect(screen, x+cellSize*0.25, y+cellSize*0.25, cellSize*0.5, cellSize*0.5, color.RGBA{255, 0, 0, 150})
-					}
-				} else if cell.State == board.Miss && v.missImage != nil {
-					// Lógica para desenhar um Erro (Miss) com imagem.
-					op := &ebiten.DrawImageOptions{}
+			if cell.State == board.Hit {
+				var img *ebiten.Image
+				if v.fireAnimation != nil {
+					img = v.fireAnimation.CurrentFrame()
+				}
+				if img == nil {
+					img = v.hitImage
+				}
+				if img != nil {
+					op.GeoM.Reset()
+					iw, ih := img.Size()
+					op.GeoM.Scale(cellSize/float64(iw), cellSize/float64(ih))
+					op.GeoM.Translate(x, y)
+					screen.DrawImage(img, op)
+				}
+			} else if cell.State == board.Miss {
+				if v.missImage != nil {
+					op.GeoM.Reset()
 					iw, ih := v.missImage.Size()
 					op.GeoM.Scale(cellSize/float64(iw), cellSize/float64(ih))
 					op.GeoM.Translate(x, y)
 					screen.DrawImage(v.missImage, op)
-				} else {
-					// Fallback genérico ou para Miss sem imagem: desenha um quadrado cinza (ou vermelho se for hit e caiu aqui por algum motivo).
-					c := color.RGBA{200, 200, 200, 150} // Cor padrão para Miss (Cinza)
-					if cell.State == board.Hit {
-						c = color.RGBA{255, 0, 0, 150} // Cor para Hit (Vermelho)
-					}
-					// Desenha um pequeno quadrado centralizado na célula.
-					ebitenutil.DrawRect(screen, x+cellSize*0.25, y+cellSize*0.25, cellSize*0.5, cellSize*0.5, c)
 				}
 			}
 		}

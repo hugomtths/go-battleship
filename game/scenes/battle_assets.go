@@ -1,9 +1,16 @@
 package scenes
 
 import (
+	"sync"
+
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/internal/assets"
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+var (
+	cachedBattleAssets *BattleAssets
+	loadBattleOnce     sync.Once
 )
 
 // BattleAssets contém os recursos gráficos e animações usados na cena de batalha.
@@ -19,28 +26,28 @@ type BattleAssets struct {
 
 // LoadBattleAssets carrega todos os assets necessários para a batalha de uma vez.
 // Retorna uma struct com ponteiros para as imagens e animações prontas.
+// Agora possui cache para que a decodificação/carregamento ocorra apenas 1 vez.
 func LoadBattleAssets() *BattleAssets {
-	// Carrega os sprites da animação de fogo e seus tempos de duração
-	frames, delays, _ := assets.LoadFireAnimation()
-	// Carrega a imagem de acerto (X)
-	hit, _ := assets.LoadHitImage()
-	// Carrega a imagem de erro (água)
-	miss, _ := assets.LoadMissImage()
+	loadBattleOnce.Do(func() {
+		frames, delays, _ := assets.LoadFireAnimation()
+		hit, _ := assets.LoadHitImage()
+		miss, _ := assets.LoadMissImage()
 
-	// Se a imagem de hit falhar, usa o primeiro frame do fogo como fallback
-	if hit == nil && len(frames) > 0 {
-		hit = frames[0]
-	}
+		if hit == nil && len(frames) > 0 {
+			hit = frames[0]
+		}
 
-	// Cria o componente de animação de fogo se houver frames carregados
-	var fireAnim *components.FireAnimation
-	if len(frames) > 0 {
-		fireAnim = components.NewFireAnimation(frames, delays)
-	}
+		var fireAnim *components.FireAnimation
+		if len(frames) > 0 {
+			fireAnim = components.NewFireAnimation(frames, delays)
+		}
 
-	return &BattleAssets{
-		FireAnimation: fireAnim,
-		HitImage:      hit,
-		MissImage:     miss,
-	}
+		cachedBattleAssets = &BattleAssets{
+			FireAnimation: fireAnim,
+			HitImage:      hit,
+			MissImage:     miss,
+		}
+	})
+
+	return cachedBattleAssets
 }

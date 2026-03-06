@@ -124,55 +124,45 @@ func DrawRoundedRect(dst *ebiten.Image, pos basic.Point, size basic.Size, r floa
 		c = colors.Transparent
 	}
 
-	//quando não usar borda arredondada, apenas desenha rect normal
-	if r == 0.0 {
-		img := ebiten.NewImage(int(size.W), int(size.H))
-		img.Fill(c)
-
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64(pos.X), float64(pos.Y))
-
-		dst.DrawImage(img, op)
-	}
-
 	w := size.W
 	h := size.H
 	x := pos.X
 	y := pos.Y
 
 	var p vector.Path
+	// AntiAlias só vale a pena em bordas arredondadas
+	useAntiAlias := r > 0.0
 
-	p.MoveTo(x+r, y)
-	p.LineTo(x+w-r, y)
-	p.QuadTo(x+w, y, x+w, y+r)
-
-	p.LineTo(x+w, y+h-r)
-	p.QuadTo(x+w, y+h, x+w-r, y+h)
-
-	p.LineTo(x+r, y+h)
-	p.QuadTo(x, y+h, x, y+h-r)
-
-	p.LineTo(x, y+r)
-	p.QuadTo(x, y, x+r, y)
-	p.Close()
+	if r == 0.0 {
+		// sem radius: retângulo direto via vector, zero alocações
+		p.MoveTo(x, y)
+		p.LineTo(x+w, y)
+		p.LineTo(x+w, y+h)
+		p.LineTo(x, y+h)
+		p.Close()
+	} else {
+		p.MoveTo(x+r, y)
+		p.LineTo(x+w-r, y)
+		p.QuadTo(x+w, y, x+w, y+r)
+		p.LineTo(x+w, y+h-r)
+		p.QuadTo(x+w, y+h, x+w-r, y+h)
+		p.LineTo(x+r, y+h)
+		p.QuadTo(x, y+h, x, y+h-r)
+		p.LineTo(x, y+r)
+		p.QuadTo(x, y, x+r, y)
+		p.Close()
+	}
 
 	cr, cg, cb, ca := c.RGBA()
-
-	DrawOpts := &vector.DrawPathOptions{
-		AntiAlias: true,
-	}
-	DrawOpts.ColorScale.Scale(
+	drawOpts := &vector.DrawPathOptions{AntiAlias: useAntiAlias}
+	drawOpts.ColorScale.Scale(
 		float32(cr)/0xffff,
 		float32(cg)/0xffff,
 		float32(cb)/0xffff,
 		float32(ca)/0xffff,
 	)
-
-	fillOpts := &vector.FillOptions{
-		FillRule: vector.FillRuleNonZero,
-	}
-
-	vector.FillPath(dst, &p, fillOpts, DrawOpts)
+	fillOpts := &vector.FillOptions{FillRule: vector.FillRuleNonZero}
+	vector.FillPath(dst, &p, fillOpts, drawOpts)
 }
 
 func (c *Container) SetColor(color color.Color) {

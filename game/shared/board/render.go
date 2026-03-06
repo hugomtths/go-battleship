@@ -5,6 +5,7 @@ package board
 import (
 	"image/color"
 	"strconv"
+	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -14,10 +15,27 @@ import (
 	"golang.org/x/image/font/opentype"
 )
 
+// cache da face para evitar recriar a cada frame
+var (
+	boardFace     font.Face
+	boardFaceOnce sync.Once
+)
+
+func getBoardFace(labelSize float64) font.Face {
+	boardFaceOnce.Do(func() {
+		tt, _ := opentype.Parse(goregular.TTF)
+		boardFace, _ = opentype.NewFace(tt, &opentype.FaceOptions{
+			Size:    labelSize,
+			DPI:     72,
+			Hinting: font.HintingFull,
+		})
+	})
+	return boardFace
+}
+
 func (b *Board) Draw(screen *ebiten.Image) {
 	cellSize := b.Size / Cols
 
-	// Draw Background
 	if b.BackgroundImage != nil {
 		op := &ebiten.DrawImageOptions{}
 		imgW, imgH := b.BackgroundImage.Size()
@@ -26,7 +44,7 @@ func (b *Board) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b.BackgroundImage, op)
 	} else {
 		// Fallback background
-		ebitenutil.DrawRect(screen, b.X, b.Y, b.Size, b.Size, color.RGBA{48, 67, 103, 255})
+		ebitenutil.DrawRect(screen, b.X, b.Y, b.Size, b.Size, color.RGBA{20, 30, 60, 255})
 	}
 
 	// Draw Grid Lines (White)
@@ -41,35 +59,28 @@ func (b *Board) Draw(screen *ebiten.Image) {
 	}
 
 	// labels
-	labelSize := float64(cellSize) * 0.5
+	labelSize := cellSize * 0.5
 	if labelSize < 12 {
 		labelSize = 12
 	}
-	tt, _ := opentype.Parse(goregular.TTF)
-	face, _ := opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    labelSize,
-		DPI:     72,
-		Hinting: font.HintingFull,
-	})
+
+	// reutiliza face cacheada — zero alocações por frame
+	face := getBoardFace(labelSize)
 	labelColor := color.White
 
 	// topo: letras A-H
 	for j := 0; j < Cols; j++ {
 		ch := string(rune('A' + j))
-		bounds := text.BoundString(face, ch)
-		w := bounds.Dx()
-		x := b.X + float64(j)*cellSize + cellSize/2 - float64(w)/2
-		y := b.Y - 10
-		text.Draw(screen, ch, face, int(x), int(y), labelColor)
+		x := int(b.X + float64(j)*cellSize + cellSize*0.3)
+		y := int(b.Y - 5)
+		text.Draw(screen, ch, face, x, y, labelColor)
 	}
 
 	// esquerda: números 1-7
 	for i := 0; i < Rows; i++ {
 		num := strconv.Itoa(i + 1)
-		bounds := text.BoundString(face, num)
-		h := bounds.Dy()
-		x := b.X - 25
-		y := b.Y + float64(i)*cellSize + cellSize/2 + float64(h)/2 - 2
-		text.Draw(screen, num, face, int(x), int(y), labelColor)
+		x := int(b.X - cellSize*0.4)
+		y := int(b.Y + float64(i)*cellSize + cellSize*0.7)
+		text.Draw(screen, num, face, x, y, labelColor)
 	}
 }

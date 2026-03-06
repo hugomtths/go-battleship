@@ -65,50 +65,48 @@ func (h *BattleHUD) Update(offset basic.Point) {
 // Draw renderiza o HUD na tela.
 // Ele consulta as estatísticas atuais do serviço e atualiza os textos antes de desenhar.
 func (h *BattleHUD) Draw(screen *ebiten.Image, b *board.Board) {
-	// Se não houver serviço, não há dados para mostrar.
 	if h.battleSvc == nil {
 		return
 	}
 
-	// Consulta as estatísticas mais recentes da batalha.
 	pShots, pHits, aiShots, aiHits, isPlayerTurn := h.battleSvc.Stats()
 
 	attempts := 0
 	hits := 0
 	isTurn := false
 
-	// Seleciona as estatísticas relevantes com base no lado configurado para este HUD.
 	if h.side == SidePlayer {
 		attempts = pShots
 		hits = pHits
-		isTurn = isPlayerTurn // É a vez do jogador?
+		isTurn = isPlayerTurn
 	} else {
 		attempts = aiShots
 		hits = aiHits
-		isTurn = !isPlayerTurn // Se não é a vez do jogador, é a vez da IA.
+		isTurn = !isPlayerTurn
 	}
 
-	// Define a posição base para desenhar os indicadores, logo abaixo do tabuleiro.
 	baseX := b.X
 	baseY := b.Y + b.Size + 20
 
-	// Define a cor do indicador de turno (Verde se for a vez deste lado, Vermelho caso contrário).
 	indicatorColor := color.RGBA{255, 0, 0, 255}
 	if isTurn {
 		indicatorColor = color.RGBA{0, 255, 0, 255}
 	}
 
-	// Desenha um pequeno quadrado indicando de quem é a vez.
 	ebitenutil.DrawRect(screen, baseX, baseY, 20, 20, indicatorColor)
 
-	// Desenha o nome do jogador/IA.
+	// atualiza texto ANTES de desenhar (evita criar string desnecessária se não mudou)
+	newAttempts := fmt.Sprintf("Tentativa: %d", attempts)
+	if h.attemptsLabel.Text != newAttempts {
+		h.attemptsLabel.Text = newAttempts
+	}
+
+	newHits := fmt.Sprintf("Acertos: %d", hits)
+	if h.hitsLabel.Text != newHits {
+		h.hitsLabel.Text = newHits
+	}
+
 	h.nameLabel.Draw(screen)
-
-	// Atualiza e desenha o contador de tentativas.
-	h.attemptsLabel.Text = fmt.Sprintf("Tentativa: %d", attempts)
 	h.attemptsLabel.Draw(screen)
-
-	// Atualiza e desenha o contador de acertos.
-	h.hitsLabel.Text = fmt.Sprintf("Acertos: %d", hits)
 	h.hitsLabel.Draw(screen)
 }
