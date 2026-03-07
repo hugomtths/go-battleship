@@ -130,10 +130,10 @@
   {
     "username": "Maria luiza",
     "player_stats": {
-      "matches": 7,
-      "wins": 6,
-      "total_shots": 462,
-      "total_hits": 167,
+      "matches": 10,
+      "wins": 9,
+      "total_shots": 692,
+      "total_hits": 239,
       "high_score": 0,
       "total_score": 0,
       "higher_hit_sequence": 6,
@@ -211,6 +211,36 @@
         "lost_ships": 5,
         "killed_ships": 0,
         "duration": 136519
+      },
+      {
+        "win": true,
+        "player_shots": 74,
+        "hits": 24,
+        "higher_hit_sequence": 4,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 119800
+      },
+      {
+        "win": true,
+        "player_shots": 73,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 74817
+      },
+      {
+        "win": true,
+        "player_shots": 83,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 91100
       }
     ],
     "current_campaign": {

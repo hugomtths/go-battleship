@@ -23,6 +23,10 @@ func NewCampaignHistoryScene(diffKey, diffName string) *CampaignHistoryScene {
 	}
 }
 
+func (s *CampaignHistoryScene) GetMusic() string {
+	return "menus"
+}
+
 func (s *CampaignHistoryScene) OnEnter(prev Scene, size basic.Size) {
 	s.init(size)
 }

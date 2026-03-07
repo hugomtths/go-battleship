@@ -15,12 +15,16 @@ type GameOverScene struct {
 	winnerName string
 	result     *entity.MatchResult
 	layout     components.Widget
+	actionLabel string
+	onAction    func()
 }
 
-func NewGameOverScene(winnerName string, result *entity.MatchResult) *GameOverScene {
+func NewGameOverScene(winnerName string, result *entity.MatchResult, actionLabel string, onAction func()) *GameOverScene {
 	return &GameOverScene{
-		winnerName: winnerName,
-		result:     result,
+		winnerName:  winnerName,
+		result:      result,
+		actionLabel: actionLabel,
+		onAction:    onAction,
 	}
 }
 
@@ -168,14 +172,23 @@ func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
 	// Botão
 	// -------------------------
 
+	label := "Retomar"
+	if s.actionLabel != "" {
+		label = s.actionLabel
+	}
+
 	restartBtn := components.NewButton(
 		basic.Point{},
-		basic.Size{W: 200, H: 60},
-		"Retomar",
+		basic.Size{W: 350, H: 60},
+		label,
 		color.RGBA{65, 81, 100, 255},
 		colors.White,
 		func(b *components.Button) {
-			SwitchTo(NewPlacementScene())
+			if s.onAction != nil {
+				s.onAction()
+			} else {
+				SwitchTo(NewPlacementScene())
+			}
 		},
 	)
 
