@@ -199,14 +199,14 @@ func (s *BattleScene) Update() error {
 		row, col, ok := s.inputCtrl.ClickedCell()
 		if ok {
 			if res, err := s.battleSvc.HandlePlayerClick(row, col); err == nil && res != nil {
-				SwitchTo(NewGameOverScene(s.battleSvc.WinnerName()))
+				SwitchTo(NewGameOverScene(s.battleSvc.WinnerName(), res))
 				return nil
 			}
 		}
 	}
 
 	if res, err := s.battleSvc.HandleEnemyTurn(); err == nil && res != nil {
-		SwitchTo(NewGameOverScene(s.battleSvc.WinnerName()))
+		SwitchTo(NewGameOverScene(s.battleSvc.WinnerName(), res))
 		return nil
 	}
 
