@@ -14,6 +14,10 @@ type MatchsHistory struct {
     StackHandler
 }
 
+func (p *MatchsHistory) GetMusic() string {
+	return "menus"
+}
+
 func (m *MatchsHistory) OnExit(_ Scene) {}
 
 func (m *MatchsHistory) OnEnter(_ Scene, screenSize basic.Size) {
@@ -35,37 +39,9 @@ func (m *MatchsHistory) Draw(screen *ebiten.Image) {
 
 func (m *MatchsHistory) init(screenSize basic.Size) {
 
-   allMatches := []entity.MatchResult{
-        {
-            Win:               true,
-            PlayerShots:       45,
-            Hits:              17,
-            HigherHitSequence: 4,
-            Score:             3200,
-            LostShips:         1,
-            KilledShips:       5,
-            Duration:          495000,
-        },
-        {
-            Win:               false,
-            PlayerShots:       28,
-            Hits:              6,
-            HigherHitSequence: 1,
-            Score:             450,
-            LostShips:         6, 
-            KilledShips:       1,
-            Duration:          320000,
-        },
-        {
-            Win:               true,
-            PlayerShots:       35,
-            Hits:              15,
-            HigherHitSequence: 3,
-            Score:             2100,
-            LostShips:         2,
-            KilledShips:       5,
-            Duration:          410000,
-        },
+    var allMatches []entity.MatchResult
+    if m.stack != nil && m.stack.ctx.Profile != nil && m.stack.ctx.Profile.History != nil {
+        allMatches = m.stack.ctx.Profile.History
     }
 
     itemsPerPage := 2
