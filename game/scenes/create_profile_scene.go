@@ -10,7 +10,7 @@ import (
 )
 
 type CreateProfileScene struct {
-	root       components.Widget
+	root       components.LayoutWidget
 	nameField  *components.TextField
 	errorText  *components.Text
 	saveButton *components.Button
@@ -112,9 +112,15 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 			buttonRow,
 		},
 	)
+	_ = s.Update()
+	s.stack.ctx.CanPopOrPush = true
+
 }
 
-func (s *CreateProfileScene) OnExit(next Scene) {}
+func (s *CreateProfileScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+
+}
 
 func (s *CreateProfileScene) Update() error {
 	s.saveButton.SetDisabled(s.nameField.Text == "")

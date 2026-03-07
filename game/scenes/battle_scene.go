@@ -17,7 +17,7 @@ type BattleScene struct {
 	// battleSvc orquestra turnos, ataques e persistência de resultado
 	battleSvc service.BattleService
 	// backButtonContainer é o container que contém a linha de botões "Recomeçar" e "Sair"
-	backButtonContainer components.Widget
+	backButtonContainer components.StylableWidget
 
 	assets *BattleAssets
 
@@ -176,11 +176,15 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 	s.playerHUD = playerHUD
 	s.aiHUD = aiHUD
 	s.inputCtrl = components.NewBattleInput(aiBoard)
+	_ = s.Update()
+	s.stack.ctx.CanPopOrPush = true
 }
 
 // OnExit é chamado quando saímos da cena de batalha.
 // Não há limpeza específica necessária aqui.
-func (s *BattleScene) OnExit(next Scene) {}
+func (s *BattleScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+}
 
 // Update trata entradas do usuário e delega a lógica de turnos ao serviço.
 // Se algum jogador vencer, a cena muda para a tela de Game Over.

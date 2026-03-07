@@ -10,11 +10,10 @@ import (
 )
 
 type SelectProfileScene struct {
-	root             components.Widget
+	root             components.LayoutWidget
 	profiles         []entity.Profile
 	screenSize       basic.Size
 	newProfileButton *components.Button
-	builded          bool
 	StackHandler
 }
 
@@ -25,29 +24,27 @@ func (s *SelectProfileScene) GetMusic() string {
 func (s *SelectProfileScene) OnEnter(prev Scene, size basic.Size) {
 	s.profiles = service.GetProfiles()
 	s.screenSize = size
-	s.root = s.buildUI(size)
-	s.builded = true
+	s.buildUI(size)
+	s.stack.ctx.CanPopOrPush = true
+
 }
 
-func (s *SelectProfileScene) OnExit(next Scene) {}
+func (s *SelectProfileScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+}
 
 func (s *SelectProfileScene) Update() error {
-	if !s.builded {
-		return nil
-	}
 	s.newProfileButton.SetDisabled(len(s.profiles) == 5) //desabilita caso n maximo de perfis salvos
 	s.root.Update(basic.Point{})
-
 	return nil
 }
 
 func (s *SelectProfileScene) Draw(screen *ebiten.Image) {
-	if s.builded {
-		s.root.Draw(screen)
-	}
+	s.root.Draw(screen)
+
 }
 
-func (s *SelectProfileScene) buildUI(size basic.Size) components.Widget {
+func (s *SelectProfileScene) buildUI(size basic.Size) {
 	title := components.NewText(
 		basic.Point{},
 		"Jogadores",
@@ -119,7 +116,7 @@ func (s *SelectProfileScene) buildUI(size basic.Size) components.Widget {
 		),
 	)
 
-	return components.NewColumn(
+	s.root = components.NewColumn(
 		basic.Point{X: 0, Y: 0},
 		16,
 		size,
@@ -127,6 +124,8 @@ func (s *SelectProfileScene) buildUI(size basic.Size) components.Widget {
 		basic.Center,
 		[]components.Widget{spacer, title, spacer, profilesWrappler, spacer, buttonRowWrappler},
 	)
+
+	_ = s.Update()
 }
 
 // buildProfileRows cria as linhas de perfil
@@ -171,9 +170,7 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 	deleteBtn := components.NewDeleteIconButton(basic.Point{}, iconSize, func() {
 		_ = service.RemoveProfile(profile.Username)
 		s.profiles = service.GetProfiles()
-		s.builded = false
-		s.root = s.buildUI(s.screenSize)
-		s.builded = true
+		s.buildUI(s.screenSize)
 	})
 
 	// Ícone de jogar

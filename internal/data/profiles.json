@@ -2,10 +2,10 @@
   {
     "username": "caua de souza",
     "player_stats": {
-      "matches": 1,
-      "wins": 0,
-      "total_shots": 36,
-      "total_hits": 15,
+      "matches": 2,
+      "wins": 1,
+      "total_shots": 83,
+      "total_hits": 39,
       "high_score": 0,
       "total_score": 0,
       "higher_hit_sequence": 5,
@@ -27,6 +27,16 @@
         "lost_ships": 3,
         "killed_ships": 0,
         "duration": 131951
+      },
+      {
+        "win": true,
+        "player_shots": 47,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 160604
       }
     ],
     "current_campaign": null,

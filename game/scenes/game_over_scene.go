@@ -88,6 +88,7 @@ func (s *GameOverScene) OnEnter(prev Scene, size basic.Size) {
 
 	rw := s.restartLabel.GetSize().W
 	s.restartLabel.SetPos(basic.Point{X: centerX - float32(rw)/2, Y: 600})
+
 }
 
 func (s *GameOverScene) OnExit(next Scene) {}

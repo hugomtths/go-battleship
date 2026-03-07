@@ -91,6 +91,7 @@ func (s *SceneStack) switchMusic(prev, next Scene) {
 
 // Pop remove última scene e chama a anterior da pilha caso exista
 func (s *SceneStack) Pop() {
+	if len(s.stack) == 0 || !s.ctx.CanPopOrPush {
 		return
 	}
 

@@ -245,11 +245,16 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	boardCenter := x + sizeX/2
 	newX := boardCenter - float64(textW)/2
 	s.playerLabel.SetPos(basic.Point{X: float32(newX), Y: 520})
+
+	s.stack.ctx.CanPopOrPush = true
+
 }
 
 // OnExit é chamado ao sair da cena de placement.
 // Não há limpeza especial necessária neste caso.
-func (s *PlacementScene) OnExit(next Scene) {}
+func (s *PlacementScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+}
 
 // Update é chamado a cada frame para tratar entradas do usuário.
 // Aqui atualizamos botões, rótulo e delegamos para o serviço de placement

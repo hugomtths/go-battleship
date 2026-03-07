@@ -8,9 +8,17 @@ import (
 )
 
 type DifficultyMenu struct {
-	layout   components.Widget
-	onSelect func(difficulty string) 
+	layout   components.LayoutWidget
+	onSelect func(difficulty string)
 	StackHandler
+}
+
+func (m *DifficultyMenu) OnExit(_ Scene) {
+	m.stack.ctx.CanPopOrPush = false
+}
+
+func (m *DifficultyMenu) GetMusic() string {
+	return "menus"
 }
 
 func NewDifficultyMenu(w, h int, onSelect func(difficulty string), onBack func()) *DifficultyMenu {
@@ -28,7 +36,7 @@ func NewDifficultyMenu(w, h int, onSelect func(difficulty string), onBack func()
 		onSelect("hard")
 	})
 
-	// Botão Voltar 
+	// Botão Voltar
 	btnVoltar := components.NewButton(
 		basic.Point{},
 		basic.Size{W: 220, H: 55},
@@ -49,16 +57,19 @@ func NewDifficultyMenu(w, h int, onSelect func(difficulty string), onBack func()
 		basic.Center,
 		[]components.Widget{
 			components.NewText(basic.Point{}, "SELEÇÃO DE DIFICULDADE", colors.White, 28),
-			btnRecruta, 
-			btnImediato, 
+			btnRecruta,
+			btnImediato,
 			btnAlmirante,
-			btnVoltar, 
+			btnVoltar,
 		},
 	)
+
 	return &DifficultyMenu{layout: column, onSelect: onSelect}
 }
 
-func (m *DifficultyMenu) OnEnter(prev Scene, size basic.Size) {}
+func (m *DifficultyMenu) OnEnter(prev Scene, size basic.Size) {
+	m.stack.ctx.CanPopOrPush = true
+}
 
 func (m *DifficultyMenu) Update() error {
 	if m.layout != nil {
@@ -72,5 +83,3 @@ func (m *DifficultyMenu) Draw(screen *ebiten.Image) {
 		m.layout.Draw(screen)
 	}
 }
-
-func (m *DifficultyMenu) Layout(w, h int) (int, int) { return w, h }
