@@ -15,6 +15,10 @@ type HomeScreen struct {
 	StackHandler //faz composição (recebe os fields e metodos)
 }
 
+func (m *HomeScreen) GetMusic() string {
+	return "menus"
+}
+
 func (m *HomeScreen) OnExit(_ Scene) {}
 
 func (m *HomeScreen) OnEnter(_ Scene, screenSize basic.Size) {

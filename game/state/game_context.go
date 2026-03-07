@@ -1,17 +1,35 @@
 package state
 
-import "github.com/allanjose001/go-battleship/internal/entity"
+import (
+	"github.com/allanjose001/go-battleship/game/scenes/audio"
+	"github.com/allanjose001/go-battleship/internal/entity"
+)
 
 // GameContext possui dados de interesse do jogo (tela de jogo, perfis, etc)
 type GameContext struct {
 	Profile       *entity.Profile
 	Match         *entity.Match
 	BattleService BattleService
+	SoundService  *audio.SoundService
 	Difficulty string
 }
 
 type ContextAware interface {
 	SetContext(*GameContext)
+}
+
+// deve ser inicializado agora
+func NewGameContext() *GameContext {
+	ss := audio.NewSoundService()
+
+	ss.LoadMusic("menus", "assets/audio/music/menus.ogg")
+	ss.LoadMusic("loss", "assets/audio/music/loss.ogg")
+	ss.LoadMusic("battle", "assets/audio/music/battle-scene.ogg")
+	ss.LoadMusic("victory", "assets/audio/music/victory.ogg")
+
+	return &GameContext{
+		SoundService: ss,
+	}
 }
 
 // BattleService define a interface para interação com a lógica de batalha.
@@ -23,9 +41,7 @@ type BattleService interface {
 	WinnerName() string
 }
 
-func NewGameContext() *GameContext {
-	return &GameContext{}
-}
+
 
 func (c *GameContext) SetProfile(p *entity.Profile) {
 	c.Profile = p

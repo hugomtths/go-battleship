@@ -2,13 +2,13 @@
   {
     "username": "caua de souza",
     "player_stats": {
-      "matches": 0,
+      "matches": 1,
       "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
+      "total_shots": 36,
+      "total_hits": 15,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 0,
+      "higher_hit_sequence": 5,
       "faster_time": 0,
       "win_without_losses": false
     },
@@ -17,7 +17,18 @@
       "Capitão",
       "Marinheiro"
     ],
-    "history": null,
+    "history": [
+      {
+        "win": false,
+        "player_shots": 36,
+        "hits": 15,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 3,
+        "killed_ships": 0,
+        "duration": 131951
+      }
+    ],
     "current_campaign": null,
     "campaigns": null
   },
@@ -57,18 +68,19 @@
   {
     "username": "Luis Henrique",
     "player_stats": {
-      "matches": 3,
-      "wins": 3,
-      "total_shots": 255,
-      "total_hits": 72,
+      "matches": 4,
+      "wins": 4,
+      "total_shots": 326,
+      "total_hits": 96,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 6,
+      "higher_hit_sequence": 7,
       "faster_time": 0,
       "win_without_losses": false
     },
     "medals": [
-      "Marinheiro"
+      "Marinheiro",
+      "Capitão"
     ],
     "history": [
       {
@@ -100,6 +112,16 @@
         "lost_ships": 5,
         "killed_ships": 0,
         "duration": 174332
+      },
+      {
+        "win": true,
+        "player_shots": 71,
+        "hits": 24,
+        "higher_hit_sequence": 7,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 187804
       }
     ],
     "current_campaign": null,

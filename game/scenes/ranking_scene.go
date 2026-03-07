@@ -14,6 +14,10 @@ type RankingScene struct {
 	StackHandler
 }
 
+func (m *RankingScene) GetMusic() string {
+	return "menus"
+}
+
 func (m *RankingScene) OnExit(_ Scene) {}
 
 func (m *RankingScene) OnEnter(_ Scene, screenSize basic.Size) {
@@ -127,7 +131,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Point{},
 		10,
 		basic.Size{W: screenSize.W, H: rankingHeight},
-		basic.Start, 
+		basic.Start,
 		basic.Center,
 		cards,
 	)
@@ -137,7 +141,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 		basic.Size{W: screenSize.W, H: rankingHeight},
 		0,
 		nil,
-		basic.Start, 
+		basic.Start,
 		basic.Center,
 		cardsColumn,
 	)
@@ -162,7 +166,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	pagRow := components.NewRow(
 		basic.Point{},
-		10, 
+		10,
 		basic.Size{W: screenSize.W, H: 40},
 		basic.Center,
 		basic.Center,
@@ -200,10 +204,10 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	m.layout = components.NewColumn(
 		basic.Point{},
-		15,           
+		15,
 		basic.Size{W: screenSize.W, H: screenSize.H},
-		basic.Start,  
-		basic.Center, 
+		basic.Start,
+		basic.Center,
 		[]components.Widget{
 			topSpacer,
 			title,

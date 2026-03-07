@@ -24,7 +24,12 @@ type GameOverScene struct {
 	restartLabel  *components.Text
 }
 
-func NewGameOverScene(winnerName string) *GameOverScene {
+func (s *GameOverScene) GetMusic() string {
+	return "loss" //TODO: MOSTRAR CARD DE HISTORICO COM DADOS
+	// DA PARTIDA E RECEEBER MATCHRESULT PARA SABER RESULTADO E TOCAR MUSICA DIFERENTE
+}
+
+func NewGameOverScene(winnerName string) *GameOverScene { //TODO: Isso deve ser um boolean
 	return &GameOverScene{
 		winnerName: winnerName,
 	}

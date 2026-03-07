@@ -60,13 +60,26 @@ func (s *SceneStack) Push(next Scene) {
 	}
 
 	var prev Scene
+
 	if len(s.stack) > 0 {
 		prev = s.stack[len(s.stack)-1]
-		prev.OnExit(next)
 	}
+
+	s.switchMusic(prev, next)
 
 	s.stack = append(s.stack, next)
 	next.OnEnter(prev, s.screenSize)
+}
+
+func (s *SceneStack) switchMusic(prev, next Scene) {
+	if prev == nil {
+		s.ctx.SoundService.Play(next.GetMusic())
+		return
+	}
+	if music := next.GetMusic(); music != "" && music != prev.GetMusic() {
+		s.ctx.SoundService.StopCurrent()
+		s.ctx.SoundService.Play(music)
+	}
 }
 
 // Pop remove última scene e chama a anterior da pilha caso exista
@@ -75,15 +88,18 @@ func (s *SceneStack) Pop() {
 		return
 	}
 
-	top := s.stack[len(s.stack)-1]
-	s.stack = s.stack[:len(s.stack)-1]
+	topIndex := len(s.stack) - 1
+	top := s.stack[topIndex]
+
+	//remove top, pop
+	s.stack = s.stack[:topIndex]
 
 	var next Scene
 	if len(s.stack) > 0 {
-		next = s.stack[len(s.stack)-1]
+		next = s.stack[topIndex-1]
 	}
 
-	top.OnExit(next)
+	//top.OnExit(next)
 
 	if next != nil {
 		// injeta contexto na próxima também (caso necessário)
@@ -92,6 +108,7 @@ func (s *SceneStack) Pop() {
 				ca.SetContext(s.ctx)
 			}
 		}
+		s.switchMusic(top, next)
 		next.OnEnter(top, s.screenSize)
 	}
 }

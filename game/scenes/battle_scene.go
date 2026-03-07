@@ -30,6 +30,10 @@ type BattleScene struct {
 	StackHandler
 }
 
+func (s *BattleScene) GetMusic() string {
+	return "battle"
+}
+
 // NewBattleScene cria a cena de batalha.
 // O estado do jogo (Match) deve ser passado via Contexto.
 func NewBattleScene() *BattleScene {
@@ -39,19 +43,19 @@ func NewBattleScene() *BattleScene {
 // OnEnter é chamado quando a cena de batalha entra em foco.
 // Aqui configuramos o fundo dos tabuleiros, inicializamos o MatchService e criamos o botão de recomeçar.
 func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
-	if s.ctx == nil || s.ctx.Match == nil {
+	if s.stack.ctx == nil || s.stack.ctx.Match == nil {
 		return
 	}
 
-	match := s.ctx.Match
+	match := s.stack.ctx.Match
 	playerBoard := match.PlayerBoard
 	aiBoard := match.EnemyBoard
 
-	if s.ctx.BattleService != nil {
-		s.battleSvc = s.ctx.BattleService
+	if s.stack.ctx.BattleService != nil {
+		s.battleSvc = s.stack.ctx.BattleService
 	} else if svc, err := service.NewBattleServiceFromMatch(match); err == nil {
 		s.battleSvc = svc
-		s.ctx.SetBattleService(svc)
+		s.stack.ctx.SetBattleService(svc)
 	}
 
 	// Fundo compartilhado para os dois tabuleiros
@@ -215,10 +219,10 @@ func (s *BattleScene) Update() error {
 
 // Draw desenha o estado atual da batalha e o botão de recomeçar.
 func (s *BattleScene) Draw(screen *ebiten.Image) {
-	if s.ctx == nil || s.ctx.Match == nil {
+	if s.stack.ctx == nil || s.stack.ctx.Match == nil {
 		return
 	}
-	match := s.ctx.Match
+	match := s.stack.ctx.Match
 	playerBoard := match.PlayerBoard
 	aiBoard := match.EnemyBoard
 
