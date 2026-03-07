@@ -16,9 +16,13 @@ type ProfileScene struct {
 	StackHandler
 }
 
+func (p *ProfileScene) GetMusic() string {
+	return "menus"
+}
+
 // init Função que inicializa componentes
 func (p *ProfileScene) init(size basic.Size) {
-	playerName := p.ctx.Profile.Username
+	playerName := p.stack.ctx.Profile.Username
 
 	// Chamamos o method agora vinculado à struct
 	medals := p.loadMedals()
@@ -41,7 +45,7 @@ func (p *ProfileScene) init(size basic.Size) {
 			components.NewStatCard(
 				basic.Point{},
 				size,
-				&p.ctx.Profile.Stats,
+				&p.stack.ctx.Profile.Stats,
 				false,
 				playerName,
 				0,
@@ -92,11 +96,11 @@ func (p *ProfileScene) init(size basic.Size) {
 	)
 }
 
-// loadMedals agora é um método de ProfileScene para acessar p.ctx.Profile.Stats
+// loadMedals agora é um método de ProfileScene para acessar p.stack.ctx.Profile.Stats
 func (p *ProfileScene) loadMedals() *[]components.Widget {
 	var widgets = []components.Widget{}
 
-	playerMedalNames := p.ctx.Profile.MedalsNames
+	playerMedalNames := p.stack.ctx.Profile.MedalsNames
 	for i, m := range medal.GetMedals(playerMedalNames) { //isso retorna o array com posicoes preservadas
 		displayIcon := medal.MedalsList[i].GrayIconPath
 		displayTitle := "BLOQUEADA"

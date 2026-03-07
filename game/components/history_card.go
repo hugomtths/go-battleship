@@ -71,12 +71,12 @@ func buildHeader(size basic.Size, result entity.MatchResult) Widget {
 			basic.Point{}, 10, rowSize,
 			basic.Start, basic.Center,
 			[]Widget{
-				mustImage("assets/icons/skull.png", 45, 45),
-				NewText(basic.Point{}, title, resultColor, 35),
-				sideSpacer(450),
-				mustImage("assets/icons/star.png", 40, 40),
-				NewText(basic.Point{}, "SCORE: ", colors.White, 35),
-				NewText(basic.Point{}, fmt.Sprintf("%03d", result.Score), scoreColor, 35),
+				mustImage("assets/icons/skull.png", 30, 30),
+				NewText(basic.Point{}, title, resultColor, 24),
+				sideSpacer(50), // Espaçamento flexível reduzido
+				mustImage("assets/icons/star.png", 24, 24),
+				NewText(basic.Point{}, "SCORE: ", colors.White, 24),
+				NewText(basic.Point{}, fmt.Sprintf("%03d", result.Score), scoreColor, 24),
 			},
 		),
 	)
@@ -112,7 +112,7 @@ func buildStatsSection(size basic.Size, result entity.MatchResult) Widget {
 }
 
 func buildLeftStats(size basic.Size, result entity.MatchResult) Widget {
-	iconRowSize := basic.Size{W: size.W, H: 40}
+	iconRowSize := basic.Size{W: size.W, H: 30}
 	_, resultColor := resolveResultLabel(result)
 
 	return NewContainer(
@@ -122,14 +122,14 @@ func buildLeftStats(size basic.Size, result entity.MatchResult) Widget {
 			basic.Point{}, 5, size,
 			basic.Start, basic.Center,
 			[]Widget{
-				buildIconRow("assets/icons/shot.png", "TIROS............................", fmt.Sprintf("%02d", result.PlayerShots), iconRowSize, resultColor),
-				buildIconRow("assets/icons/target.png", "HITS.............",
+				buildIconRow("assets/icons/shot.png", "TIROS: ", fmt.Sprintf("%02d", result.PlayerShots), iconRowSize, resultColor),
+				buildIconRow("assets/icons/target.png", "HITS: ",
 					fmt.Sprintf("%02d (%02.2f%%)",
 						result.Hits,
 						safeHitPercent(result.Hits, result.PlayerShots)),
 					iconRowSize,
 					resultColor),
-				buildIconRow("assets/icons/eye.png", "MAIOR SEQUENCIA......",
+				buildIconRow("assets/icons/eye.png", "SEQUENCIA: ",
 					fmt.Sprintf("%02d", result.HigherHitSequence),
 					iconRowSize,
 					resultColor),
@@ -139,7 +139,7 @@ func buildLeftStats(size basic.Size, result entity.MatchResult) Widget {
 }
 
 func buildRightStats(size basic.Size, result entity.MatchResult) Widget {
-	iconRowSize := basic.Size{W: size.W, H: 40}
+	iconRowSize := basic.Size{W: size.W, H: 30}
 	_, resultColor := resolveResultLabel(result)
 
 	return NewContainer(
@@ -149,11 +149,11 @@ func buildRightStats(size basic.Size, result entity.MatchResult) Widget {
 			basic.Point{}, 5, size,
 			basic.Start, basic.Center,
 			[]Widget{
-				buildIconRow("assets/icons/clock.png", "DURAÇÃO...............",
+				buildIconRow("assets/icons/clock.png", "DURAÇÃO: ",
 					result.FormattedDuration(),
 					iconRowSize,
 					resultColor),
-				buildIconRow("assets/icons/anchor.png", "NAVIOS PERDIDOS...",
+				buildIconRow("assets/icons/anchor.png", "PERDIDOS: ",
 					fmt.Sprintf("%02d/06", result.LostShips),
 					iconRowSize,
 					resultColor),

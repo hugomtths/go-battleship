@@ -2,13 +2,13 @@
   {
     "username": "caua de souza",
     "player_stats": {
-      "matches": 0,
+      "matches": 1,
       "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
+      "total_shots": 36,
+      "total_hits": 15,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 0,
+      "higher_hit_sequence": 5,
       "faster_time": 0,
       "win_without_losses": false
     },
@@ -17,7 +17,18 @@
       "Capitão",
       "Marinheiro"
     ],
-    "history": null,
+    "history": [
+      {
+        "win": false,
+        "player_shots": 36,
+        "hits": 15,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 3,
+        "killed_ships": 0,
+        "duration": 131951
+      }
+    ],
     "current_campaign": null,
     "campaigns": null
   },
@@ -57,18 +68,19 @@
   {
     "username": "Luis Henrique",
     "player_stats": {
-      "matches": 3,
-      "wins": 3,
-      "total_shots": 255,
-      "total_hits": 72,
+      "matches": 4,
+      "wins": 4,
+      "total_shots": 326,
+      "total_hits": 96,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 6,
+      "higher_hit_sequence": 7,
       "faster_time": 0,
       "win_without_losses": false
     },
     "medals": [
-      "Marinheiro"
+      "Marinheiro",
+      "Capitão"
     ],
     "history": [
       {
@@ -100,6 +112,16 @@
         "lost_ships": 5,
         "killed_ships": 0,
         "duration": 174332
+      },
+      {
+        "win": true,
+        "player_shots": 71,
+        "hits": 24,
+        "higher_hit_sequence": 7,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 187804
       }
     ],
     "current_campaign": null,
@@ -108,19 +130,145 @@
   {
     "username": "Maria luiza",
     "player_stats": {
-      "matches": 0,
-      "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
+      "matches": 10,
+      "wins": 9,
+      "total_shots": 692,
+      "total_hits": 239,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 0,
+      "higher_hit_sequence": 6,
       "faster_time": 0,
       "win_without_losses": false
     },
     "medals": null,
-    "history": null,
-    "current_campaign": null,
+    "history": [
+      {
+        "win": true,
+        "player_shots": 62,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 66485
+      },
+      {
+        "win": true,
+        "player_shots": 70,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 2,
+        "killed_ships": 0,
+        "duration": 77099
+      },
+      {
+        "win": true,
+        "player_shots": 60,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 82352
+      },
+      {
+        "win": true,
+        "player_shots": 55,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 3,
+        "killed_ships": 0,
+        "duration": 61167
+      },
+      {
+        "win": false,
+        "player_shots": 62,
+        "hits": 23,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 6,
+        "killed_ships": 0,
+        "duration": 70600
+      },
+      {
+        "win": true,
+        "player_shots": 60,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 74168
+      },
+      {
+        "win": true,
+        "player_shots": 93,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 136519
+      },
+      {
+        "win": true,
+        "player_shots": 74,
+        "hits": 24,
+        "higher_hit_sequence": 4,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 119800
+      },
+      {
+        "win": true,
+        "player_shots": 73,
+        "hits": 24,
+        "higher_hit_sequence": 5,
+        "score": 0,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 74817
+      },
+      {
+        "win": true,
+        "player_shots": 83,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 91100
+      }
+    ],
+    "current_campaign": {
+      "id": "camp_1772850275",
+      "difficulty_step": {
+        "easy": {
+          "win": true,
+          "player_shots": 62,
+          "hits": 24,
+          "higher_hit_sequence": 5,
+          "score": 0,
+          "lost_ships": 1,
+          "killed_ships": 0,
+          "duration": 66485
+        },
+        "medium": {
+          "win": true,
+          "player_shots": 60,
+          "hits": 24,
+          "higher_hit_sequence": 6,
+          "score": 0,
+          "lost_ships": 4,
+          "killed_ships": 0,
+          "duration": 74168
+        }
+      },
+      "is_active": true
+    },
     "campaigns": null
   }
 ]

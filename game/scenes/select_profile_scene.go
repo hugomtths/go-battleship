@@ -18,6 +18,10 @@ type SelectProfileScene struct {
 	StackHandler
 }
 
+func (s *SelectProfileScene) GetMusic() string {
+	return "menus"
+}
+
 func (s *SelectProfileScene) OnEnter(prev Scene, size basic.Size) {
 	s.profiles = service.GetProfiles()
 	s.screenSize = size
@@ -157,7 +161,7 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 		colors.PlayerInput,
 		nil,
 		func(b *components.Button) {
-			s.ctx.Profile = p
+			s.stack.ctx.Profile = p
 			s.stack.Push(&ProfileScene{})
 
 		},
@@ -174,7 +178,7 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 
 	// Ícone de jogar
 	playBtn := components.NewPlayIconButton(basic.Point{}, iconSize, func() {
-		s.ctx.Profile = p
+		s.stack.ctx.Profile = p
 		s.stack.Push(&ModeSelectionScene{})
 		//s.stack.Push(&PlacementScene{})
 	})

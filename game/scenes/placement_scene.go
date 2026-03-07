@@ -52,7 +52,19 @@ type PlacementScene struct {
 	playButton *components.Button
 	// container com a linha de start sob a coluna de navios
 	rightButtons components.Widget
+
+	// Elementos decorativos (ex: Título da partida em modo campanha)
+	decorations []components.Widget
+
+	// Estado da Série (Melhor de 3)
+	matchIndex        int // 1, 2 ou 3
+	seriesScorePlayer int
+	seriesScoreEnemy  int
 	StackHandler
+}
+
+func (s *PlacementScene) GetMusic() string {
+	return "menus" //TODO Procurar musica para placement
 }
 
 // NewPlacementScene cria uma cena de posicionamento vazia.
@@ -64,11 +76,19 @@ func NewPlacementSceneWithProfile(p *entity.Profile) *PlacementScene {
 	return &PlacementScene{playerProfile: p}
 }
 
+// SetSeriesState configura o estado da série de partidas (ex: partida 2 de 3)
+func (s *PlacementScene) SetSeriesState(index, pWins, eWins int) {
+	s.matchIndex = index
+	s.seriesScorePlayer = pWins
+	s.seriesScoreEnemy = eWins
+}
+
 // OnEnter é chamado quando a cena entra em foco.
 // Aqui criamos o tabuleiro, carregamos imagens, configuramos navios,
 // serviços e os botões de interface.
 func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	// Cria o tabuleiro do jogador na tela
+	s.decorations = []components.Widget{}
 	b := board.NewBoard(80, 100, 400)
 
 	// Tenta carregar a imagem de fundo do tabuleiro
@@ -133,8 +153,8 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 			matchID := fmt.Sprintf("match-%d", time.Now().UnixNano())
 
 			diff := "easy"
-			if s.ctx != nil && s.ctx.Difficulty != "" {
-				diff = s.ctx.Difficulty
+			if s.stack.ctx != nil && s.stack.ctx.Difficulty != "" {
+				diff = s.stack.ctx.Difficulty
 			}
 
 			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile)
@@ -145,12 +165,18 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				return
 			}
 
-			if s.ctx != nil {
-				s.ctx.SetMatch(match)
-				s.ctx.SetBattleService(svc)
+			if s.stack.ctx != nil {
+				s.stack.ctx.SetMatch(match)
+				s.stack.ctx.SetBattleService(svc)
 			}
 
-			SwitchTo(NewBattleScene())
+			// Configura a cena de batalha com o estado da série
+			battleScene := NewBattleScene()
+			if s.ctx != nil && s.ctx.IsCampaign {
+				battleScene.SetSeriesState(s.matchIndex, s.seriesScorePlayer, s.seriesScoreEnemy)
+			}
+
+			SwitchTo(battleScene)
 		},
 	)
 
@@ -221,8 +247,8 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	)
 
 	// Tenta recuperar profile do contexto se não tiver sido passado
-	if s.playerProfile == nil && s.ctx != nil && s.ctx.Profile != nil {
-		s.playerProfile = s.ctx.Profile
+	if s.playerProfile == nil && s.stack.ctx != nil && s.stack.ctx.Profile != nil {
+		s.playerProfile = s.stack.ctx.Profile
 	}
 
 	// Cria o rótulo com o nome do jogador
@@ -241,6 +267,40 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	boardCenter := x + sizeX/2
 	newX := boardCenter - float64(textW)/2
 	s.playerLabel.SetPos(basic.Point{X: float32(newX), Y: 520})
+
+	// Se estiver em modo campanha (matchIndex > 0), exibe info da série
+	if s.matchIndex > 0 {
+		aiName := "IA"
+		if s.ctx != nil {
+			switch s.ctx.Difficulty {
+			case "easy":
+				aiName = "Recruta Bot"
+			case "medium":
+				aiName = "Imediato Bot"
+			case "hard":
+				aiName = "Almirante Bot"
+			}
+		}
+
+		pName := "Você"
+		if s.playerProfile != nil && s.playerProfile.Username != "" {
+			pName = s.playerProfile.Username
+		}
+
+		line1 := fmt.Sprintf("Partida %d/3", s.matchIndex)
+		line2 := fmt.Sprintf("%s %d X %d %s", pName, s.seriesScorePlayer, s.seriesScoreEnemy, aiName)
+
+		t1 := components.NewText(basic.Point{}, line1, colors.White, 24)
+		t2 := components.NewText(basic.Point{}, line2, colors.GoldMedal, 28)
+
+		centerX := float32(size.W) / 2
+		yBase := float32(650)
+
+		t1.SetPos(basic.Point{X: centerX - float32(t1.GetSize().W)/2, Y: yBase})
+		t2.SetPos(basic.Point{X: centerX - float32(t2.GetSize().W)/2, Y: yBase + 30})
+
+		s.decorations = append(s.decorations, t1, t2)
+	}
 }
 
 // OnExit é chamado ao sair da cena de placement.
@@ -258,6 +318,9 @@ func (s *PlacementScene) Update() error {
 		s.rightButtons.Update(basic.Point{})
 	}
 	s.playerLabel.Update(basic.Point{})
+	for _, d := range s.decorations {
+		d.Update(basic.Point{})
+	}
 
 	// Pega a posição atual do mouse em coordenadas de tela
 	mx, my := ebiten.CursorPosition()
@@ -301,6 +364,9 @@ func (s *PlacementScene) Draw(screen *ebiten.Image) {
 		s.rightButtons.Draw(screen)
 	}
 	s.playerLabel.Draw(screen)
+	for _, d := range s.decorations {
+		d.Draw(screen)
+	}
 
 	// Linha vertical separando tabuleiro e navios da lateral
 	lineX := 640.0

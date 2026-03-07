@@ -16,8 +16,8 @@ type IconRow struct {
 func NewIconRow(path, label, data string, size basic.Size, pos basic.Point, statusColor color.Color) (Widget, error) {
 
 	icon, err := NewImage(path, basic.Point{}, basic.Size{
-		W: 40,
-		H: 40,
+		W: 24,
+		H: 24,
 	})
 
 	return &IconRow{
@@ -30,8 +30,8 @@ func NewIconRow(path, label, data string, size basic.Size, pos basic.Point, stat
 				basic.Start, basic.Center,
 				[]Widget{
 					icon,
-					NewText(basic.Point{}, label, colors.White, 35),
-					NewText(basic.Point{}, data, statusColor, 35),
+					NewText(basic.Point{}, label, colors.White, 18),
+					NewText(basic.Point{}, data, statusColor, 18),
 				},
 			),
 		),

@@ -7,6 +7,7 @@ var (
 	White       = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 	Black       = color.RGBA{A: 255}
 	Red         = color.RGBA{R: 255, A: 255}
+	Green       = color.RGBA{R: 0, G: 255, B: 0, A: 255}
 	DarkBlue    = color.RGBA{R: 13, G: 89, B: 99, A: 255}
 	Blue        = color.RGBA{R: 43, G: 112, B: 121, A: 255}
 	NightBlue   = color.RGBA{R: 40, G: 40, B: 50, A: 255}

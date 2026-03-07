@@ -29,6 +29,8 @@ type Scene interface {
 	// Recebe a tela onde tudo deve ser desenhado.
 	// Não deve alterar regras de jogo, apenas renderizar o estado atual.
 	Draw(screen *ebiten.Image)
+
+	GetMusic() string
 }
 
 //TODO: remover isso
