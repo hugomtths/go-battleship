@@ -17,6 +17,10 @@ type CreateProfileScene struct {
 	StackHandler
 }
 
+func (s *CreateProfileScene) GetMusic() string {
+	return "menus"
+}
+
 func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 	label := components.NewText(
 		basic.Point{},
