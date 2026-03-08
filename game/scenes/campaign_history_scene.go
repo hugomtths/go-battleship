@@ -1,6 +1,8 @@
 package scenes
 
 import (
+	"strings"
+
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -37,17 +39,16 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	profile := s.ctx.Profile
 	var results []entity.MatchResult
 
-	// Coleta resultados de campanhas passadas
-	for _, c := range profile.Campaigns {
-		if res, ok := c.DifficultyStep[s.difficultyKey]; ok {
-			results = append(results, res)
+	// Coleta histórico geral filtrando por modo Campanha e dificuldade selecionada
+	for _, match := range profile.History {
+		if strings.Contains(match.Mode, "Campanha") && match.Difficulty == s.difficultyKey {
+			results = append(results, match)
 		}
 	}
-	// Coleta resultado da campanha atual
-	if profile.CurrentCampaign != nil {
-		if res, ok := profile.CurrentCampaign.DifficultyStep[s.difficultyKey]; ok {
-			results = append(results, res)
-		}
+
+	// Inverte a ordem para mostrar os mais recentes primeiro
+	for i, j := 0, len(results)-1; i < j; i, j = i+1, j-1 {
+		results[i], results[j] = results[j], results[i]
 	}
 
 	// Paginação
@@ -75,7 +76,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	for _, res := range pageResults {
 		card := components.NewHistoryCard(
 			basic.Point{},
-			basic.Size{W: size.W * 0.6, H: 200}, // Tamanho reduzido
+			basic.Size{W: size.W * 0.9, H: 240},
 			res,
 		)
 		cards = append(cards, card)
