@@ -159,7 +159,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 
 			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile)
 
-			svc, err := service.NewBattleServiceFromMatch(match)
+			svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
 			if err != nil {
 				fmt.Println("Erro ao criar serviço de batalha:", err)
 				return

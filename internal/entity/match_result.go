@@ -12,6 +12,7 @@ type MatchResult struct {
 	LostShips         int   `json:"lost_ships"`
 	KilledShips       int   `json:"killed_ships"`
 	Duration          int64 `json:"duration"` //-> em milissegundos
+	Mode			  string `json:"mode"`
 }
 
 // FormattedDuration retorna string para ser usada no front
