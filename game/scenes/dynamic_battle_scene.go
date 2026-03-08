@@ -73,7 +73,7 @@ func (s *DynamicBattleScene) OnEnter(prev Scene, size basic.Size) {
 
 	if s.ctx.BattleService != nil {
 		s.battleSvc = s.ctx.BattleService
-	} else if svc, err := service.NewBattleServiceFromMatch(match); err == nil {
+	} else if svc, err := service.NewBattleServiceFromMatch(match, s.ctx.IsCampaign); err == nil {
 		s.battleSvc = svc
 		s.ctx.SetBattleService(svc)
 	}
