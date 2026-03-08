@@ -13,6 +13,7 @@ type SoundService struct {
 	musics  map[string]*Music //mapa nome->music
 	lock    sync.Mutex        //thread safe
 	current *Music            //musica atual para fade
+	muted   bool
 }
 
 const fadeDuration = 1200 * time.Millisecond
@@ -72,4 +73,25 @@ func (ss *SoundService) CloseAll() error {
 		}
 	}
 	return nil
+}
+
+func (ss *SoundService) IsMuted() bool {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+	return ss.muted
+}
+
+func (ss *SoundService) ToggleMute() {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	ss.muted = !ss.muted
+
+	for _, m := range ss.musics {
+		if ss.muted {
+			m.SetVolume(0)
+		} else {
+			m.SetVolume(m.originalVolume)
+		}
+	}
 }

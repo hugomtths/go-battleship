@@ -16,11 +16,12 @@ const sampleRate = 44100
 // Music representa uma musica OGG
 // encapsula player, stream, volume e fade
 type Music struct {
-	player *audio.Player // player de audio
-	file   *os.File
-	stream *vorbis.Stream // stream decodificada
-	volume float64        // volume atual (0.0 a 1.0)
-	lock   sync.Mutex     // lock para thread-safe
+	player         *audio.Player // player de audio
+	file           *os.File
+	stream         *vorbis.Stream // stream decodificada
+	volume         float64        // volume atual (0.0 a 1.0)
+	originalVolume float64        // volume que deve ser restaurado ao desmutar
+	lock           sync.Mutex     // lock para thread-safe
 }
 
 // NewMusic cria uma musica a partir de arquivo OGG
@@ -43,10 +44,11 @@ func NewMusic(ctx *audio.Context, path string) *Music {
 	}
 
 	return &Music{
-		file:   file,
-		stream: stream,
-		player: player,
-		volume: 1.0,
+		file:           file,
+		stream:         stream,
+		player:         player,
+		volume:         1.0,
+		originalVolume: 1.0,
 	}
 }
 
@@ -81,6 +83,12 @@ func (m *Music) SetVolume(vol float64) {
 	defer m.lock.Unlock()
 	m.volume = vol
 	m.player.SetVolume(vol)
+}
+
+func (m *Music) SetOriginalVolume(vol float64) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.originalVolume = vol
 }
 
 // FadeTo faz fade do volume atual para target em duration
