@@ -86,7 +86,7 @@ func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
 			fmt.Sprintf("Maior Sequência: %d", s.result.HigherHitSequence),
 			fmt.Sprintf("Navios Perdidos: %d", s.result.LostShips),
 			fmt.Sprintf("Acertos: %d", s.result.Hits),
-			fmt.Sprintf("Duração: %d", s.result.Duration),
+			fmt.Sprintf("Duração: %s", s.result.FormattedDuration()),
 		}
 
 		for _, stat := range statsData {
