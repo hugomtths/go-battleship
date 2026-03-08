@@ -9,7 +9,7 @@ import (
 )
 
 type CampaignHistoryScene struct {
-	root           components.Widget
+	root components.Widget
 	StackHandler
 	difficultyKey  string
 	difficultyName string
@@ -29,6 +29,8 @@ func (s *CampaignHistoryScene) GetMusic() string {
 
 func (s *CampaignHistoryScene) OnEnter(prev Scene, size basic.Size) {
 	s.init(size)
+	_ = s.Update()
+	s.stack.ctx.CanPopOrPush = true
 }
 
 func (s *CampaignHistoryScene) init(size basic.Size) {
@@ -108,7 +110,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	// Botões de navegação
 	hasPrev := s.currentPage > 0
 	hasNext := end < len(results)
-	
+
 	var previousHandler func(*components.Button)
 	var nextHandler func(*components.Button)
 
@@ -184,7 +186,9 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	)
 }
 
-func (s *CampaignHistoryScene) OnExit(next Scene) {}
+func (s *CampaignHistoryScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+}
 
 func (s *CampaignHistoryScene) Update() error {
 	if s.root != nil {

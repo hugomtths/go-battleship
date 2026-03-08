@@ -15,14 +15,19 @@ type MatchsHistory struct {
 	StackHandler
 }
 
-func (p *MatchsHistory) GetMusic() string {
+func (m *MatchsHistory) GetMusic() string {
 	return "menus"
 }
 
-func (m *MatchsHistory) OnExit(_ Scene) {}
+func (m *MatchsHistory) OnExit(_ Scene) {
+	m.stack.ctx.CanPopOrPush = false
+}
 
 func (m *MatchsHistory) OnEnter(_ Scene, screenSize basic.Size) {
 	m.init(screenSize)
+
+	_ = m.Update()
+	m.stack.ctx.CanPopOrPush = true
 }
 
 func (m *MatchsHistory) Update() error {
@@ -166,6 +171,7 @@ func (m *MatchsHistory) init(screenSize basic.Size) {
 		cardsColumn,
 	)
 
+
 	backButton := components.NewContainer(
 		basic.Point{},
 		basic.Size{W: screenSize.W, H: 60},
@@ -185,6 +191,7 @@ func (m *MatchsHistory) init(screenSize basic.Size) {
 	var mainWidgets []components.Widget
 	mainWidgets = append(mainWidgets, topSpacer, title)
 	mainWidgets = append(mainWidgets, cardsContainer)
+
 	mainWidgets = append(mainWidgets, paginationContainer, backButton)
 
 	m.layout = components.NewColumn(

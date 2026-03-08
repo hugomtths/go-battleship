@@ -47,6 +47,11 @@ func (s *SceneStack) Current() Scene {
 
 // Push adiciona scene à pilha e chama OnExit na anterior + OnEnter na scene do parâmetro
 func (s *SceneStack) Push(next Scene) {
+
+	if !s.ctx.CanPopOrPush { //GAMBIARRA
+		return
+	}
+
 	// injeta stack se a cena suportar
 	if aware, ok := next.(stackAware); ok {
 		aware.SetStack(s)
@@ -63,6 +68,8 @@ func (s *SceneStack) Push(next Scene) {
 
 	if len(s.stack) > 0 {
 		prev = s.stack[len(s.stack)-1]
+
+		prev.OnExit(next)
 	}
 
 	s.switchMusic(prev, next)
@@ -84,7 +91,7 @@ func (s *SceneStack) switchMusic(prev, next Scene) {
 
 // Pop remove última scene e chama a anterior da pilha caso exista
 func (s *SceneStack) Pop() {
-	if len(s.stack) == 0 {
+	if len(s.stack) == 0 || !s.ctx.CanPopOrPush {
 		return
 	}
 
@@ -100,6 +107,7 @@ func (s *SceneStack) Pop() {
 	}
 
 	//top.OnExit(next)
+	top.OnExit(next)
 
 	if next != nil {
 		// injeta contexto na próxima também (caso necessário)

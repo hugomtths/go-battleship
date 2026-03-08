@@ -22,8 +22,12 @@ func (c *CampaignScene) GetMusic() string {
 	return "menus"
 }
 
-func (c *CampaignScene) OnEnter(prev Scene, size basic.Size) {
+func (c *CampaignScene) 
+
+(prev Scene, size basic.Size) {
 	c.refreshUI(size)
+	_ = c.Update()
+	c.stack.ctx.CanPopOrPush = true
 }
 
 func (c *CampaignScene) refreshUI(size basic.Size) {
@@ -147,7 +151,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 	case "done":
 		bgColor = color.RGBA{40, 100, 40, 255} // Verde escuro para concluído
 		content = append(content, components.NewText(basic.Point{}, "CONCLUÍDO", colors.White, 18))
-		
+
 		// Botão Batalhar (Rejogar)
 		btn := components.NewButton(
 			basic.Point{},
@@ -156,7 +160,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 			colors.Dark,
 			colors.White,
 			func(b *components.Button) {
-				// Inicializa campanha se for a primeira vez 
+				// Inicializa campanha se for a primeira vez
 				if c.ctx.Profile.CurrentCampaign == nil {
 					c.ctx.Profile.CurrentCampaign = &entity.Campaign{
 						ID:             fmt.Sprintf("camp_%d", time.Now().Unix()),
@@ -167,7 +171,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 				// Configura dificuldade no contexto e vai para posicionamento
 				c.ctx.SetDifficulty(diff)
 				c.ctx.IsCampaign = true
-				
+
 				// Inicia a série de 3 partidas (Partida 1, Placar 0-0)
 				ps := NewPlacementSceneWithProfile(c.ctx.Profile)
 				ps.SetSeriesState(1, 0, 0)
@@ -241,7 +245,9 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 	)
 }
 
-func (c *CampaignScene) OnExit(next Scene) {}
+func (c *CampaignScene) OnExit(next Scene) {
+	c.stack.ctx.CanPopOrPush = false
+}
 
 func (c *CampaignScene) Update() error {
 	if c.root != nil {

@@ -2,15 +2,17 @@
   {
     "username": "caua de souza",
     "player_stats": {
+
       "matches": 3,
       "wins": 1,
       "total_shots": 222,
       "total_hits": 62,
+
       "high_score": 0,
       "total_score": 0,
       "higher_hit_sequence": 6,
       "faster_time": 0,
-      "win_without_losses": false
+      "win_without_losses": true
     },
     "medals": [
       "Almirante",
@@ -50,6 +52,7 @@
         "killed_ships": 0,
         "duration": 70502,
         "mode": "Campanha"
+
       }
     ],
     "current_campaign": {
@@ -215,6 +218,37 @@
       "difficulty_step": {},
       "is_active": true
     },
+    "campaigns": null
+  },
+  {
+    "username": "teste 123",
+    "player_stats": {
+      "matches": 1,
+      "wins": 0,
+      "total_shots": 96,
+      "total_hits": 23,
+      "high_score": 0,
+      "total_score": 0,
+      "higher_hit_sequence": 7,
+      "faster_time": 0,
+      "win_without_losses": false
+    },
+    "medals": [
+      "Capitão"
+    ],
+    "history": [
+      {
+        "win": false,
+        "player_shots": 96,
+        "hits": 23,
+        "higher_hit_sequence": 7,
+        "score": 0,
+        "lost_ships": 6,
+        "killed_ships": 0,
+        "duration": 184843
+      }
+    ],
+    "current_campaign": null,
     "campaigns": null
   }
 ]

@@ -9,7 +9,7 @@ import (
 )
 
 type RankingScene struct {
-	layout      components.Widget
+	layout      components.LayoutWidget
 	currentPage int
 	StackHandler
 }
@@ -18,10 +18,14 @@ func (m *RankingScene) GetMusic() string {
 	return "menus"
 }
 
-func (m *RankingScene) OnExit(_ Scene) {}
+func (m *RankingScene) OnExit(_ Scene) {
+	m.stack.ctx.CanPopOrPush = false
+}
 
 func (m *RankingScene) OnEnter(_ Scene, screenSize basic.Size) {
 	m.init(screenSize)
+	m.stack.ctx.CanPopOrPush = true
+
 }
 
 func (m *RankingScene) Update() error {
@@ -216,4 +220,5 @@ func (m *RankingScene) init(screenSize basic.Size) {
 			backButton,
 		},
 	)
+	_ = m.Update()
 }

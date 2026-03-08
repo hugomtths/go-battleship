@@ -14,9 +14,10 @@ import (
 type GameOverScene struct {
 	winnerName string
 	result     *entity.MatchResult
-	layout     components.Widget
+	layout     components.LayoutWidget
 	actionLabel string
 	onAction    func()
+	StackHandler
 }
 
 func NewGameOverScene(winnerName string, result *entity.MatchResult, actionLabel string, onAction func()) *GameOverScene {
@@ -35,6 +36,8 @@ func (s *GameOverScene) GetMusic() string {
 func (s *GameOverScene) OnEnter(prev Scene, size basic.Size) {
 	// Layout unificado para vitória e derrota, mudando apenas Título e GIF
 	s.setupGameOverLayout(size)
+	_ = s.Update()
+	s.stack.ctx.CanPopOrPush = true
 }
 
 func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
@@ -226,7 +229,9 @@ func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
 	s.layout = mainColumn
 }
 
-func (s *GameOverScene) OnExit(next Scene) {}
+func (s *GameOverScene) OnExit(next Scene) {
+	s.stack.ctx.CanPopOrPush = false
+}
 
 func (s *GameOverScene) Update() error {
 

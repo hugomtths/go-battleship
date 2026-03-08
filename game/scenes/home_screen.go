@@ -11,15 +11,17 @@ import (
 )
 
 type HomeScreen struct {
-	layout       components.Widget
-	StackHandler //faz composição (recebe os fields e metodos)
+	layout       components.LayoutWidget
+	StackHandler //faz composição (recebe os fields e metodos
 }
 
 func (m *HomeScreen) GetMusic() string {
 	return "menus"
 }
 
-func (m *HomeScreen) OnExit(_ Scene) {}
+func (m *HomeScreen) OnExit(_ Scene) {
+	m.stack.ctx.CanPopOrPush = false
+}
 
 func (m *HomeScreen) OnEnter(_ Scene, screenSize basic.Size) {
 
@@ -29,9 +31,12 @@ func (m *HomeScreen) OnEnter(_ Scene, screenSize basic.Size) {
 		log.Fatal("Erro ao carregar componentes na tela inicial: ", err)
 	}
 
+	m.stack.ctx.CanPopOrPush = true
+
 }
 
 func (m *HomeScreen) Update() error {
+
 	if m.layout != nil {
 		m.layout.Update(basic.Point{X: 0, Y: 0})
 	}
@@ -70,8 +75,8 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
-					// ir para tela de seleção de perfis
 					m.stack.Push(&SelectProfileScene{})
+
 				},
 			),
 
@@ -99,5 +104,9 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 			),
 		},
 	)
+	err = m.Update()
+	if err != nil {
+		return err
+	}
 	return nil
 }

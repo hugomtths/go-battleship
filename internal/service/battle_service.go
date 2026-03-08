@@ -70,7 +70,6 @@ func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleServ
 			return nil, err
 		}
 	} else {
-
 		switch match.Difficulty {
 		case "easy":
 			aiPlayer = ai.NewEasyAIPlayer()

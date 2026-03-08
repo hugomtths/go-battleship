@@ -35,6 +35,8 @@ const (
 var (
 	// Jogada inválida (ex.: célula já atacada).
 	ErrInvalidAttackCell = errors.New("invalid attack cell")
+	// Partida não iniciada ou configuração inválida.
+	ErrMatchNotReady = errors.New("match not ready")
 )
 
 // AttackEvent é um evento “do match” para o front consumir (opcional, mas útil).
@@ -52,9 +54,10 @@ type AttackEvent struct {
 // Match é a partida.
 // Observação: Boards e IA NÃO são serializáveis e ficam com json:"-".
 type Match struct {
-	ID     string      `json:"id"`
-	Status MatchStatus `json:"status"`
-	Difficulty string  `json:"difficulty"`
+	ID            string      `json:"id"`
+	Status        MatchStatus `json:"status"`
+	Difficulty    string      `json:"difficulty"`
+	IsDynamicMode bool        `json:"is_dynamic_mode"`
 
 	Turn   TurnOwner `json:"turn"`
 	Winner TurnOwner `json:"winner"` // "" enquanto não terminou

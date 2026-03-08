@@ -7,12 +7,15 @@ import (
 
 // GameContext possui dados de interesse do jogo (tela de jogo, perfis, etc)
 type GameContext struct {
-	Profile       *entity.Profile
-	Match         *entity.Match
-	BattleService BattleService
-	SoundService  *audio.SoundService
-	Difficulty string
-	IsCampaign bool
+
+	Profile              *entity.Profile
+	Match                *entity.Match
+	BattleService        BattleService
+	DynamicBattleService DynamicBattleService
+	SoundService         *audio.SoundService
+	Difficulty           string
+	IsCampaign           bool
+	IsDynamicMode        bool
 }
 
 type ContextAware interface {
@@ -30,6 +33,7 @@ func NewGameContext() *GameContext {
 
 	return &GameContext{
 		SoundService: ss,
+		CanPopOrPush: true,
 	}
 }
 
@@ -42,7 +46,10 @@ type BattleService interface {
 	WinnerName() string
 }
 
-
+type DynamicBattleService interface {
+	HandlePlayerMove(row, col int, dir entity.Direction) error
+	HandleEnemyMove() error
+}
 
 func (c *GameContext) SetProfile(p *entity.Profile) {
 	c.Profile = p
@@ -56,6 +63,10 @@ func (c *GameContext) SetBattleService(s BattleService) {
 	c.BattleService = s
 }
 
+func (c *GameContext) SetDynamicBattleService(s DynamicBattleService) {
+	c.DynamicBattleService = s
+}
+
 func (c *GameContext) SetDifficulty(d string) {
-    c.Difficulty = d
+	c.Difficulty = d
 }

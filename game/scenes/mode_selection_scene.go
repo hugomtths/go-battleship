@@ -10,7 +10,7 @@ import (
 
 // ModeSelectionScene permite escolher entre Partida Clássica e Campanha.
 type ModeSelectionScene struct {
-	root components.Widget
+	root components.LayoutWidget
 	StackHandler
 	profile *entity.Profile
 }
@@ -28,16 +28,37 @@ func (m *ModeSelectionScene) OnEnter(prev Scene, size basic.Size) {
 	btnSize := basic.Size{W: 300, H: 60}
 	// PARTIDA CLÁSSICA -> abre seleção de dificuldade
 	classicBtn := components.NewButton(basic.Point{}, btnSize, "Partida Clássica", colors.Dark, nil, func(b *components.Button) {
+		if m.ctx != nil {
+			m.ctx.IsDynamicMode = false
+			m.ctx.IsCampaign = false
+		}
 		m.stack.Push(&DifficultyScene{})
 	})
 
-    campaignBtn := components.NewButton(basic.Point{}, btnSize, "Campanha", colors.Dark, nil, func(b *components.Button) {
-        // garante que o profile esteja no contexto
-        if m.ctx != nil && m.profile != nil {
-            m.ctx.Profile = m.profile
-        }
-        m.stack.Push(&CampaignScene{})
-    })
+	campaignBtn := components.NewButton(basic.Point{}, btnSize, "Campanha", colors.Dark, nil, func(b *components.Button) {
+		// garante que o profile esteja no contexto
+		if m.ctx != nil {
+			m.ctx.IsDynamicMode = false
+			m.ctx.IsCampaign = true
+			if m.profile != nil {
+				m.ctx.Profile = m.profile
+			}
+		}
+		m.stack.Push(&CampaignScene{})
+	})
+
+	dynamicBtn := components.NewButton(basic.Point{}, btnSize, "Dinâmico", colors.Dark, nil, func(b *components.Button) {
+		// Modo Dinâmico: Dificuldade Hard, IsDynamicMode = true
+		if m.ctx != nil {
+			m.ctx.SetDifficulty("hard")
+			m.ctx.IsCampaign = false
+			m.ctx.IsDynamicMode = true
+			if m.profile != nil {
+				m.ctx.Profile = m.profile
+			}
+		}
+		m.stack.Push(NewPlacementSceneWithProfile(m.profile))
+	})
 
 	backBtn := components.NewButton(basic.Point{}, basic.Size{W: 220, H: 50}, "Voltar", colors.Dark, nil, func(b *components.Button) {
 		m.stack.Pop()
@@ -54,12 +75,17 @@ func (m *ModeSelectionScene) OnEnter(prev Scene, size basic.Size) {
 			components.NewText(basic.Point{}, "SELECIONE O MODO DE JOGO", colors.White, 28),
 			classicBtn,
 			campaignBtn,
+			dynamicBtn,
 			backBtn,
 		},
 	)
+	m.stack.ctx.CanPopOrPush = true
+	_ = m.Update()
 }
 
-func (m *ModeSelectionScene) OnExit(next Scene) {}
+func (m *ModeSelectionScene) OnExit(next Scene) {
+	m.stack.ctx.CanPopOrPush = false
+}
 
 func (m *ModeSelectionScene) Update() error {
 	if m.root != nil {
@@ -97,11 +123,17 @@ func (d *DifficultyScene) OnEnter(prev Scene, size basic.Size) {
 
 		d.stack.Push(NewPlacementSceneWithProfile(prof))
 	}, d.stack.Pop)
+	_ = d.menu.Update()
+	d.stack.ctx.CanPopOrPush = true
+
 }
 
-func (d *DifficultyScene) OnExit(next Scene) {}
+func (d *DifficultyScene) OnExit(next Scene) {
+	d.stack.ctx.CanPopOrPush = false
+}
 
 func (d *DifficultyScene) Update() error {
+
 	if d.menu != nil {
 		err := d.menu.Update()
 		return err
@@ -114,5 +146,3 @@ func (d *DifficultyScene) Draw(screen *ebiten.Image) {
 		d.menu.Draw(screen)
 	}
 }
-
-func (d *DifficultyScene) Layout(w, h int) (int, int) { return w, h }

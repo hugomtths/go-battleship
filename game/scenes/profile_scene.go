@@ -20,6 +20,25 @@ func (p *ProfileScene) GetMusic() string {
 	return "menus"
 }
 
+// Implementações do contrato Scene
+func (p *ProfileScene) OnEnter(prev Scene, size basic.Size) {
+	p.init(size)
+	p.stack.ctx.CanPopOrPush = true
+}
+
+func (p *ProfileScene) OnExit(next Scene) {
+	p.stack.ctx.CanPopOrPush = false
+}
+
+func (p *ProfileScene) Update() error {
+	p.root.Update(basic.Point{X: 0, Y: 0})
+	return nil
+}
+
+func (p *ProfileScene) Draw(screen *ebiten.Image) {
+	p.root.Draw(screen)
+}
+
 // init Função que inicializa componentes
 func (p *ProfileScene) init(size basic.Size) {
 	playerName := p.stack.ctx.Profile.Username
@@ -94,6 +113,7 @@ func (p *ProfileScene) init(size basic.Size) {
 			),
 		},
 	)
+	_ = p.Update()
 }
 
 // loadMedals agora é um método de ProfileScene para acessar p.stack.ctx.Profile.Stats
@@ -117,20 +137,4 @@ func (p *ProfileScene) loadMedals() *[]components.Widget {
 	}
 
 	return &widgets
-}
-
-// Implementações do contrato Scene
-func (p *ProfileScene) OnEnter(prev Scene, size basic.Size) {
-	p.init(size)
-}
-
-func (p *ProfileScene) OnExit(next Scene) {}
-
-func (p *ProfileScene) Update() error {
-	p.root.Update(basic.Point{X: 0, Y: 0})
-	return nil
-}
-
-func (p *ProfileScene) Draw(screen *ebiten.Image) {
-	p.root.Draw(screen)
 }
