@@ -2,7 +2,6 @@ package scenes
 
 import (
 	"image/color"
-
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -66,7 +65,7 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 
 	if s.ctx.BattleService != nil {
 		s.battleSvc = s.ctx.BattleService
-	} else if svc, err := service.NewBattleServiceFromMatch(match); err == nil {
+	} else if svc, err := service.NewBattleServiceFromMatch(match, s.ctx.IsCampaign); err == nil {
 		s.battleSvc = svc
 		s.ctx.SetBattleService(svc)
 	}
@@ -248,44 +247,37 @@ func (s *BattleScene) Update() error {
 
 // handleMatchEnd centraliza a lógica de fim de jogo e fluxo de campanha
 func (s *BattleScene) handleMatchEnd(res *entity.MatchResult) {
-	
+	// finalRes aponta para res por padrão (modo clássico)
 	finalRes := res
 
-	// Lógica de Série de Campanha (Melhor de 3 / 3 Partidas)
 	if s.ctx != nil && s.ctx.IsCampaign {
-		// Atualiza placar da série
 		if res.Win {
 			s.seriesScorePlayer++
 		} else {
 			s.seriesScoreEnemy++
 		}
 
-		// Se ainda não completou 3 partidas, vai para a próxima
 		if s.matchIndex < 3 {
 			nextScene := NewPlacementSceneWithProfile(s.ctx.Profile)
-			// Passa o estado atualizado para a próxima tela de posicionamento
 			nextScene.SetSeriesState(s.matchIndex+1, s.seriesScorePlayer, s.seriesScoreEnemy)
 			SwitchTo(nextScene)
 			return
 		}
 
-		// Se completou as 3 partidas, define o resultado final da campanha
 		seriesWon := s.seriesScorePlayer > s.seriesScoreEnemy
-		
-		// Cria um resultado sintético para salvar o progresso da fase
+
+		// syntheticRes herda tudo de res (incluindo Mode="Campanha")
 		syntheticRes := *res
-		syntheticRes.Win = seriesWon // O que importa para desbloquear a próxima fase é vencer a série
-		finalRes = &syntheticRes
-		
+		syntheticRes.Win = seriesWon
+		finalRes = &syntheticRes // ← agora sobrescreve o finalRes externo
+
 		s.checkCampaignProgress(finalRes)
 	}
 
-	// Configuração da tela de Game Over (apenas se acabou a série ou é jogo clássico)
 	winner := s.battleSvc.WinnerName()
 	isWin := res.Win
 	actionLabel := "Clique para Recomeçar"
 
-	// Ação padrão (Partida Clássica ou Derrota)
 	onAction := func() {
 		if s.ctx.Profile != nil {
 			SwitchTo(NewPlacementSceneWithProfile(s.ctx.Profile))
@@ -294,22 +286,20 @@ func (s *BattleScene) handleMatchEnd(res *entity.MatchResult) {
 		}
 	}
 
-	// Lógica específica de Campanha
 	if s.ctx != nil && s.ctx.IsCampaign {
-		// Sobrescreve vencedor baseado na série
 		isWin = s.seriesScorePlayer > s.seriesScoreEnemy
 		if isWin {
 			winner = s.ctx.Profile.Username
 		} else {
 			winner = "IA Oponente"
 		}
-		
 		actionLabel = "Voltar para Campanha"
 		onAction = func() {
 			SwitchTo(&CampaignScene{})
 		}
 	}
 
+	_ = isWin
 	SwitchTo(NewGameOverScene(winner, finalRes, actionLabel, onAction))
 }
 
@@ -318,7 +308,7 @@ func (s *BattleScene) checkCampaignProgress(res *entity.MatchResult) {
 	if s.ctx != nil && s.ctx.IsCampaign && s.ctx.Profile != nil && s.ctx.Profile.CurrentCampaign != nil {
 		// Atualiza o passo atual da campanha com o resultado
 		s.ctx.Profile.CurrentCampaign.DifficultyStep[s.ctx.Difficulty] = *res
-		
+
 		// Salva o perfil atualizado no disco
 		// (BattleService já salvou histórico, agora salvamos o estado da campanha)
 		service.UpdateProfile(*s.ctx.Profile)

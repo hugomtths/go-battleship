@@ -28,33 +28,32 @@ func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
 	var iconSize basic.Size
 
 	if title == "BLOQUEADA" {
-		iconSize = basic.Size{
-			W: 40,
-			H: 55,
-		}
+		iconSize = basic.Size{W: 40, H: 55}
 	} else {
-		iconSize = basic.Size{
-			W: 40,
-			H: 70,
-		}
+		iconSize = basic.Size{W: 40, H: 70}
 	}
+
 	iconImage, err := NewImage(icon, basic.Point{}, iconSize)
 	titleTxt := NewText(basic.Point{}, title, colors.GoldMedal, 16)
-	descTxt := NewText(basic.Point{}, desc, colors.GoldMedal, 12)
 
-	var iconHandler Widget //nao vai parar o jogo so por causa de um asset rsrssrs
+	// Largura máxima da descrição = mesma do container de texto original (size.W * 0.6)
+	// O texto vai quebrar linha e centralizar automaticamente dentro dessa área
+	descTxt := NewTextWrap(basic.Point{}, desc, colors.GoldMedal, 12, size.W*0.6)
+
+	var iconHandler Widget
 
 	if err != nil {
 		iconHandler = NewText(basic.Point{}, "ERROR", colors.Red, 16)
 	} else {
 		iconHandler = iconImage
 	}
+
 	return &MedalCard{
 		size: size,
-		body: NewContainer( // container pai do card inteiro
+		body: NewContainer(
 			basic.Point{},
 			size,
-			15, // borda mais arredondada para destacar visualmente
+			15,
 			colors.White,
 			basic.Center,
 			basic.Center,
@@ -64,7 +63,7 @@ func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
 				basic.Center,
 				basic.Center,
 				[]Widget{
-					// Container do ícone (largura proporcional ao pai)
+					// Container do ícone — igual ao original
 					NewContainer(
 						basic.Point{},
 						basic.Size{
@@ -75,7 +74,7 @@ func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
 						iconHandler,
 					),
 
-					// Container de texto (título + descrição)
+					// Container de texto — igual ao original
 					NewContainer(
 						basic.Point{},
 						basic.Size{
@@ -93,7 +92,7 @@ func NewMedal(icon, title, desc string, size basic.Size) *MedalCard {
 							basic.Center,
 							[]Widget{
 								titleTxt,
-								descTxt,
+								descTxt, // <- única mudança: Text -> TextWrap
 							},
 						),
 					),

@@ -32,11 +32,13 @@ type battleService struct {
 	aiPlayer *ai.AIPlayer
 	// profile é o perfil do jogador humano, usado para registrar estatísticas de vitória/derrota.
 	profile *entity.Profile
+
+	isCampaign bool
 }
 
 // NewBattleServiceFromMatch inicializa o serviço a partir de um Match existente no contexto.
 // Se o Match ainda não foi inicializado (runtime), ele configura a IA e inicia o jogo.
-func NewBattleServiceFromMatch(match *entity.Match) (BattleService, error) {
+func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleService, error) {
 	setupSvc := NewBattleSetupService()
 	matchSvc := NewMatchService(nil, 500*time.Millisecond)
 
@@ -81,10 +83,11 @@ func NewBattleServiceFromMatch(match *entity.Match) (BattleService, error) {
 	}
 
 	return &battleService{
-		matchSvc: matchSvc,
-		match:    match,
-		aiPlayer: aiPlayer,
-		profile:  match.Profile,
+		matchSvc:   matchSvc,
+		match:      match,
+		aiPlayer:   aiPlayer,
+		profile:    match.Profile,
+		isCampaign: isCampaign,
 	}, nil
 }
 
@@ -103,12 +106,13 @@ func (s *battleService) HandlePlayerClick(row, col int) (*entity.MatchResult, er
 
 	// Se o ataque resultou em Game Over, processa o fim de jogo.
 	if ev.GameOver {
-		// Gera o resultado final da partida.
 		res := s.matchSvc.ResultForPlayer(s.match)
-		// Registra o resultado no perfil do jogador (se existir).
-		if s.profile != nil {
-			_, _ = AddMatchToProfile(s.profile, res)
+		if s.isCampaign {
+			res.Mode = "Campanha"
+		} else {
+			res.Mode = "Clássica"
 		}
+
 		return &res, nil
 	}
 
@@ -139,6 +143,12 @@ func (s *battleService) HandleEnemyTurn() (*entity.MatchResult, error) {
 	// Se a IA venceu, processa o fim de jogo.
 	if ev.GameOver {
 		res := s.matchSvc.ResultForPlayer(s.match)
+		if s.isCampaign {
+			res.Mode = "Campanha"
+		} else {
+			res.Mode = "Clássica"
+		}
+
 		if s.profile != nil {
 			_, _ = AddMatchToProfile(s.profile, res)
 		}

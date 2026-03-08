@@ -1,6 +1,7 @@
 package scenes
 
 import (
+
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
@@ -24,6 +25,7 @@ func (m *MatchsHistory) OnExit(_ Scene) {
 
 func (m *MatchsHistory) OnEnter(_ Scene, screenSize basic.Size) {
 	m.init(screenSize)
+
 	_ = m.Update()
 	m.stack.ctx.CanPopOrPush = true
 }
@@ -42,7 +44,6 @@ func (m *MatchsHistory) Draw(screen *ebiten.Image) {
 }
 
 func (m *MatchsHistory) init(screenSize basic.Size) {
-
 	var allMatches []entity.MatchResult
 	if m.stack != nil && m.stack.ctx.Profile != nil && m.stack.ctx.Profile.History != nil {
 		allMatches = m.stack.ctx.Profile.History
@@ -150,6 +151,27 @@ func (m *MatchsHistory) init(screenSize basic.Size) {
 		cards = append(cards, card)
 	}
 
+	// Altura fixa para a área de cards evita estouro do layout
+	cardsAreaHeight := float32(265*itemsPerPage + 20*(itemsPerPage-1))
+
+	cardsColumn := components.NewColumn(
+		basic.Point{},
+		20,
+		basic.Size{W: screenSize.W, H: cardsAreaHeight},
+		basic.Start,
+		basic.Center,
+		cards,
+	)
+
+	cardsContainer := components.NewContainer(
+		basic.Point{},
+		basic.Size{W: screenSize.W, H: cardsAreaHeight},
+		0, nil,
+		basic.Start, basic.Center,
+		cardsColumn,
+	)
+
+
 	backButton := components.NewContainer(
 		basic.Point{},
 		basic.Size{W: screenSize.W, H: 60},
@@ -168,7 +190,8 @@ func (m *MatchsHistory) init(screenSize basic.Size) {
 
 	var mainWidgets []components.Widget
 	mainWidgets = append(mainWidgets, topSpacer, title)
-	mainWidgets = append(mainWidgets, cards...)
+	mainWidgets = append(mainWidgets, cardsContainer)
+
 	mainWidgets = append(mainWidgets, paginationContainer, backButton)
 
 	m.layout = components.NewColumn(
