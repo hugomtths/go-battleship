@@ -12,6 +12,7 @@ import (
 
 type HomeScreen struct {
 	layout       components.LayoutWidget
+	muteButton   *components.IconButton
 	StackHandler //faz composição (recebe os fields e metodos
 }
 
@@ -36,10 +37,15 @@ func (m *HomeScreen) OnEnter(_ Scene, screenSize basic.Size) {
 }
 
 func (m *HomeScreen) Update() error {
-
 	if m.layout != nil {
 		m.layout.Update(basic.Point{X: 0, Y: 0})
 	}
+
+	if m.muteButton != nil {
+		// offset 0,0 porque a posição do botão já é absoluta na tela
+		m.muteButton.Update(basic.Point{X: 0, Y: 0})
+	}
+
 	return nil
 }
 
@@ -47,9 +53,23 @@ func (m *HomeScreen) Draw(screen *ebiten.Image) {
 	if m.layout != nil {
 		m.layout.Draw(screen)
 	}
+	if m.muteButton != nil {
+		m.muteButton.Draw(screen) // desenha o botão fixo no canto inferior esquerdo
+	}
 }
 
-// init Inicializa componentes
+func (m *HomeScreen) toggleMute() {
+	fmt.Println("toggle mute")
+
+	m.stack.ctx.SoundService.ToggleMute()
+
+	if m.stack.ctx.SoundService.IsMuted() {
+		m.muteButton.SetIcon("assets/images/mute.png")
+	} else {
+		m.muteButton.SetIcon("assets/images/unmute.png")
+	}
+}
+
 func (m *HomeScreen) init(screenSize basic.Size) error {
 	var err error
 	homeImage, err := components.NewImage(
@@ -60,11 +80,29 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 	if err != nil {
 		return err
 	}
+
+	m.muteButton = components.NewIconButton(
+		"assets/images/unmute.png",
+		basic.Point{},
+		basic.Size{W: 40, H: 40},
+		m.toggleMute,
+	)
+
+	if m.stack.ctx.SoundService.IsMuted() {
+		m.muteButton.SetIcon("assets/images/mute.png")
+	}
+
+	// ➤ Defina a posição manualmente para o canto inferior esquerdo
+	m.muteButton.SetPos(basic.Point{
+		X: 10,                // 10px da esquerda
+		Y: screenSize.H - 50, // 10px acima da base (considerando altura 40px do botão)
+	})
+
 	m.layout = components.NewColumn(
 		basic.Point{},
 		20,
 		screenSize,
-		basic.Center,
+		basic.Start,
 		basic.Center,
 		[]components.Widget{
 			homeImage,
@@ -104,9 +142,12 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 			),
 		},
 	)
-	err = m.Update()
-	if err != nil {
-		return err
+
+	// ➤ Atualize também o Update para o botão fixo
+	if m.layout != nil {
+		m.layout.Update(basic.Point{X: 0, Y: 0})
 	}
+	m.muteButton.Update(basic.Point{X: 0, Y: 0}) // offset 0,0 porque posição já está definida
+
 	return nil
 }
