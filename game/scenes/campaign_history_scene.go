@@ -51,7 +51,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 	}
 
 	// Paginação
-	itemsPerPage := 2
+	itemsPerPage := 2 
 	start := s.currentPage * itemsPerPage
 	end := start + itemsPerPage
 	if start > len(results) {

@@ -268,7 +268,6 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	newX := boardCenter - float64(textW)/2
 	s.playerLabel.SetPos(basic.Point{X: float32(newX), Y: 520})
 
-	s.stack.ctx.CanPopOrPush = true
 	// Se estiver em modo campanha (matchIndex > 0), exibe info da série
 	if s.matchIndex > 0 {
 		aiName := "IA"

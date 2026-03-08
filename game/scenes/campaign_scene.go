@@ -22,7 +22,9 @@ func (c *CampaignScene) GetMusic() string {
 	return "menus"
 }
 
-func (c *CampaignScene) OnEnter(prev Scene, size basic.Size) {
+func (c *CampaignScene) 
+
+(prev Scene, size basic.Size) {
 	c.refreshUI(size)
 	_ = c.Update()
 	c.stack.ctx.CanPopOrPush = true
