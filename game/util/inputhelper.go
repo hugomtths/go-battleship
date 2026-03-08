@@ -38,7 +38,7 @@ func ReceiveText(text *string, active bool) {
 	*text = string(runes)
 
 	// backspace
-	if ebiten.IsKeyPressed(ebiten.KeyBackspace) && len(*text) > 0 {
-		*text = (*text)[:len(*text)-1]
-	}
+    if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(*text) > 0 {
+        *text = (*text)[:len(*text)-1]
+    }
 }
