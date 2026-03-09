@@ -47,7 +47,31 @@ func (v *BattleBoardView) DrawBoard(screen *ebiten.Image, b *board.Board, ships 
 			// Só desenha se o navio estiver marcado como posicionado.
 			if ship.Placed {
 				// Verifica se o navio correspondente na frota lógica está afundado.
-				if i < len(fleet.Ships) && fleet.Ships[i].IsDestroyed() {
+				isSunk := false
+
+				// 1. Tenta via mapeamento espacial (entityBoard)
+				if entityBoard != nil {
+					// Usa a posição do navio para encontrar a referência lógica correta
+					if ship.Y >= 0 && ship.Y < len(entityBoard.Positions) && ship.X >= 0 && ship.X < len(entityBoard.Positions[0]) {
+						pos := entityBoard.Positions[ship.Y][ship.X]
+						entShip := entity.GetShipReference(pos)
+						if entShip != nil && entShip.IsDestroyed() {
+							isSunk = true
+						}
+					}
+				}
+
+				// 2. Fallback: Se não encontrou via espaço (ou entityBoard nulo), tenta via índice na frota.
+				// Isso garante que se o mapeamento espacial falhar, ainda temos a correspondência por ordem/tamanho.
+				if !isSunk && fleet != nil && i < len(fleet.Ships) {
+					logicalShip := fleet.Ships[i]
+					// Só considera se o tamanho bater (proteção contra desincronia de índices)
+					if logicalShip.Size == ship.Size && logicalShip.IsDestroyed() {
+						isSunk = true
+					}
+				}
+
+				if isSunk {
 					// Se estiver afundado, usa a imagem de navio afundado.
 					originalImage := ship.Image
 					ship.Image = ship.SunkImage

@@ -3,6 +3,7 @@ package scenes
 import (
 	"fmt"
 	"image/color"
+	"sort"
 	"time"
 
 	"github.com/allanjose001/go-battleship/game/components"
@@ -116,15 +117,11 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 
 	s.board = b
 	s.ships = ships
-
-	// Cria o serviço de placement, responsável apenas por posicionamento visual
 	s.svc = service.NewPlacementService(b, ships)
 
-	// Cores dos botões
 	btnColor := color.RGBA{48, 67, 103, 255}
 	playBtnColor := color.RGBA{60, 120, 60, 255}
 
-	// Botão Voltar
 	backButton := components.NewButton(
 		basic.Point{},
 		basic.Size{W: 120, H: 50},
@@ -132,13 +129,10 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 		btnColor,
 		colors.White,
 		func(b *components.Button) {
-			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			s.stack.Pop()
 		},
 	)
 
-	// Botão para iniciar a batalha. Só funciona se todos os navios
-	// tiverem sido posicionados no tabuleiro.
 	s.playButton = components.NewButton(
 		basic.Point{},
 		basic.Size{W: 150, H: 50},
@@ -146,51 +140,33 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 		playBtnColor,
 		colors.White,
 		func(b *components.Button) {
-			s.ctx.SoundService.PlaySFX("click", 0.8)
-			factory := service.NewGameService()
-			gs, enemyShips := factory.NewBattleGameState(s.board, s.ships)
-
-			// Assign images to enemy ships
-			battleAssets := LoadBattleAssets()
-			for _, ship := range enemyShips {
-				switch ship.Size {
-				case 6:
-					ship.SunkImage = battleAssets.SunkShip3
-				case 4:
-					ship.SunkImage = battleAssets.SunkShip4
-				case 3:
-					ship.SunkImage = battleAssets.SunkShip2
-				case 1:
-					ship.SunkImage = battleAssets.SunkShip1
-				}
-				// We don't need to set the normal Image because it won't be drawn unless sunk.
-				// But just in case, we could set it too if we had it.
-				// For now, let's assume DrawBoard handles nil Image if we only draw sunk.
-				// Actually, DrawShip checks if ship.Image == nil and returns.
-				// So we MUST set ship.Image as well, or modify DrawShip.
-				// Let's set ship.Image to the same sunk image or a placeholder if we want to be safe,
-				// or reuse the player's images if we can access them easily.
-				// The player's images are in s.ships but they are instanced.
-				// Loading them again is fine.
+			if !s.svc.AllShipsPlaced() {
+				return
 			}
 
-			// We need to provide a valid Image for DrawShip to work, even if we swap it later.
-			// Let's load the images again.
-			img1, _, _ := ebitenutil.NewImageFromFile("assets/images/1 slot 1.png")
-			img2, _, _ := ebitenutil.NewImageFromFile("assets/images/3 slots 2.png")
-			img3, _, _ := ebitenutil.NewImageFromFile("assets/images/Frame 400.png")
-			img4, _, _ := ebitenutil.NewImageFromFile("assets/images/NAVIO 4 SLOTS 1.png")
+			factory := service.NewGameService()
+			gs, aiShips := factory.NewBattleGameState(s.board, s.ships)
 
-			for _, ship := range enemyShips {
+			// Ordena navios da IA para garantir consistência com a lógica de batalha
+			sort.Slice(aiShips, func(i, j int) bool {
+				return aiShips[i].Size > aiShips[j].Size
+			})
+
+			// ✅ Atribui texturas aos navios da IA
+			for _, ship := range aiShips {
 				switch ship.Size {
 				case 6:
 					ship.Image = img3
+					ship.SunkImage = battleAssets.SunkShip3
 				case 4:
 					ship.Image = img4
+					ship.SunkImage = battleAssets.SunkShip4
 				case 3:
 					ship.Image = img2
+					ship.SunkImage = battleAssets.SunkShip2
 				case 1:
 					ship.Image = img1
+					ship.SunkImage = battleAssets.SunkShip1
 				}
 			}
 
@@ -202,15 +178,15 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 			}
 
 			isDynamic := s.stack.ctx != nil && s.stack.ctx.IsDynamicMode
-			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, isDynamic)
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, aiShips, s.playerProfile, isDynamic)
 
 			if s.stack.ctx != nil {
 				s.stack.ctx.Match = match
 				s.stack.ctx.BattleService = nil // limpa para forçar recriação correta
 			}
 
-			// Para modo dinâmico: NÃO cria BattleService aqui.
-			// A DynamicBattleScene cria o próprio serviço com NewDynamicAIPlayer (com ownBoard).
+			// ✅ CORREÇÃO: Para modo dinâmico, NÃO cria BattleService aqui
+			// A DynamicBattleScene cria o próprio serviço
 			if !isDynamic {
 				svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
 				if err != nil {
@@ -251,7 +227,6 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				btnColor,
 				colors.White,
 				func(b *components.Button) {
-					s.ctx.SoundService.PlaySFX("click", 0.8)
 					s.svc.RandomPlacement()
 				},
 			),
@@ -262,7 +237,6 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				btnColor,
 				colors.White,
 				func(b *components.Button) {
-					s.ctx.SoundService.PlaySFX("click", 0.8)
 					s.svc.Rotate()
 				},
 			),
@@ -373,9 +347,6 @@ func (s *PlacementScene) OnExit(next Scene) {
 // Aqui atualizamos botões, rótulo e delegamos para o serviço de placement
 // as interações de clique/arraste dos navios.
 func (s *PlacementScene) Update() error {
-
-	s.playButton.SetDisabled(!s.svc.AllShipsPlaced())
-
 	if s.leftButtons != nil {
 		s.leftButtons.Update(basic.Point{})
 	}
