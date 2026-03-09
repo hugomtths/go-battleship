@@ -201,5 +201,5 @@ func (s *battleService) WinnerName() string {
 	}
 
 	// Caso contrário, a IA venceu.
-	return "IA_MAR"
+	return "IA"
 }
