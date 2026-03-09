@@ -1,95 +1,121 @@
 [
   {
-    "username": "caua de souza",
+    "username": "Alcielma Luzinete",
     "player_stats": {
-
-      "matches": 3,
-      "wins": 1,
-      "total_shots": 222,
-      "total_hits": 62,
-
+      "matches": 7,
+      "wins": 7,
+      "total_shots": 528,
+      "total_hits": 168,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 6,
+      "higher_hit_sequence": 8,
       "faster_time": 0,
-      "win_without_losses": true
+      "win_without_losses": false
     },
     "medals": [
-      "Almirante",
       "Capitão",
-      "Marinheiro"
+      "Capitão de Mar e Guerra"
     ],
     "history": [
       {
-        "win": false,
-        "player_shots": 36,
-        "hits": 15,
-        "higher_hit_sequence": 5,
-        "score": 0,
-        "lost_ships": 3,
-        "killed_ships": 0,
-        "duration": 131951,
-        "mode": ""
-      },
-      {
-        "win": false,
-        "player_shots": 99,
-        "hits": 23,
+        "win": true,
+        "difficulty": "hard",
+        "player_shots": 73,
+        "hits": 24,
         "higher_hit_sequence": 6,
         "score": 0,
-        "lost_ships": 6,
+        "lost_ships": 5,
         "killed_ships": 0,
-        "duration": 147037,
+        "duration": 112594,
         "mode": "Clássica"
       },
       {
         "win": true,
-        "player_shots": 87,
+        "difficulty": "hard",
+        "player_shots": 67,
+        "hits": 24,
+        "higher_hit_sequence": 4,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 95369,
+        "mode": "Clássica"
+      },
+      {
+        "win": true,
+        "difficulty": "easy",
+        "player_shots": 90,
+        "hits": 24,
+        "higher_hit_sequence": 8,
+        "score": 0,
+        "lost_ships": 3,
+        "killed_ships": 0,
+        "duration": 86166,
+        "mode": "Campanha"
+      },
+      {
+        "win": true,
+        "difficulty": "easy",
+        "player_shots": 74,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 79266,
+        "mode": "Campanha"
+      },
+      {
+        "win": true,
+        "difficulty": "easy",
+        "player_shots": 90,
         "hits": 24,
         "higher_hit_sequence": 5,
         "score": 0,
-        "lost_ships": 2,
+        "lost_ships": 5,
         "killed_ships": 0,
-        "duration": 70502,
+        "duration": 84398,
         "mode": "Campanha"
-
+      },
+      {
+        "win": true,
+        "difficulty": "hard",
+        "player_shots": 50,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 3,
+        "killed_ships": 0,
+        "duration": 52782,
+        "mode": "Clássica"
+      },
+      {
+        "win": true,
+        "difficulty": "hard",
+        "player_shots": 84,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 0,
+        "lost_ships": 5,
+        "killed_ships": 0,
+        "duration": 96431,
+        "mode": "Clássica"
       }
     ],
     "current_campaign": {
-      "id": "camp_1772929848",
-      "difficulty_step": {},
-      "is_active": true
-    },
-    "campaigns": null
-  },
-  {
-    "username": "malub",
-    "player_stats": {
-      "matches": 0,
-      "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
-      "high_score": 0,
-      "total_score": 0,
-      "higher_hit_sequence": 0,
-      "faster_time": 0,
-      "win_without_losses": false
-    },
-    "medals": null,
-    "history": null,
-    "current_campaign": {
-      "id": "camp_malub",
+      "id": "camp_1773065095",
       "difficulty_step": {
         "easy": {
           "win": true,
-          "player_shots": 0,
-          "hits": 0,
-          "higher_hit_sequence": 0,
-          "score": 500,
-          "lost_ships": 0,
+          "difficulty": "easy",
+          "player_shots": 90,
+          "hits": 24,
+          "higher_hit_sequence": 5,
+          "score": 0,
+          "lost_ships": 5,
           "killed_ships": 0,
-          "duration": 0,
-          "mode": ""
+          "duration": 84398,
+          "mode": "Campanha"
         }
       },
       "is_active": true
@@ -97,155 +123,43 @@
     "campaigns": null
   },
   {
-    "username": "Luis Henrique",
-    "player_stats": {
-      "matches": 5,
-      "wins": 5,
-      "total_shots": 388,
-      "total_hits": 120,
-      "high_score": 0,
-      "total_score": 0,
-      "higher_hit_sequence": 7,
-      "faster_time": 0,
-      "win_without_losses": false
-    },
-    "medals": [
-      "Marinheiro",
-      "Capitão"
-    ],
-    "history": [
-      {
-        "win": true,
-        "player_shots": 93,
-        "hits": 24,
-        "higher_hit_sequence": 6,
-        "score": 0,
-        "lost_ships": 6,
-        "killed_ships": 0,
-        "duration": 203908,
-        "mode": ""
-      },
-      {
-        "win": true,
-        "player_shots": 64,
-        "hits": 24,
-        "higher_hit_sequence": 5,
-        "score": 0,
-        "lost_ships": 4,
-        "killed_ships": 0,
-        "duration": 95577,
-        "mode": ""
-      },
-      {
-        "win": true,
-        "player_shots": 98,
-        "hits": 24,
-        "higher_hit_sequence": 4,
-        "score": 0,
-        "lost_ships": 5,
-        "killed_ships": 0,
-        "duration": 174332,
-        "mode": ""
-      },
-      {
-        "win": true,
-        "player_shots": 71,
-        "hits": 24,
-        "higher_hit_sequence": 7,
-        "score": 0,
-        "lost_ships": 4,
-        "killed_ships": 0,
-        "duration": 187804,
-        "mode": ""
-      },
-      {
-        "win": true,
-        "player_shots": 62,
-        "hits": 24,
-        "higher_hit_sequence": 5,
-        "score": 0,
-        "lost_ships": 1,
-        "killed_ships": 0,
-        "duration": 153404,
-        "mode": ""
-      }
-    ],
-    "current_campaign": null,
-    "campaigns": null
-  },
-  {
-    "username": "Teste",
+    "username": "luca",
     "player_stats": {
       "matches": 2,
-      "wins": 1,
-      "total_shots": 103,
-      "total_hits": 39,
+      "wins": 2,
+      "total_shots": 171,
+      "total_hits": 48,
       "high_score": 0,
       "total_score": 0,
-      "higher_hit_sequence": 7,
+      "higher_hit_sequence": 5,
       "faster_time": 0,
       "win_without_losses": false
     },
-    "medals": [
-      "Capitão"
-    ],
+    "medals": null,
     "history": [
       {
-        "win": false,
-        "player_shots": 49,
-        "hits": 15,
-        "higher_hit_sequence": 4,
+        "win": true,
+        "difficulty": "hard",
+        "player_shots": 85,
+        "hits": 24,
+        "higher_hit_sequence": 5,
         "score": 0,
-        "lost_ships": 6,
+        "lost_ships": 4,
         "killed_ships": 0,
-        "duration": 49451,
+        "duration": 86377,
         "mode": "Clássica"
       },
       {
         "win": true,
-        "player_shots": 54,
+        "difficulty": "hard",
+        "player_shots": 86,
         "hits": 24,
-        "higher_hit_sequence": 7,
+        "higher_hit_sequence": 5,
         "score": 0,
-        "lost_ships": 1,
+        "lost_ships": 5,
         "killed_ships": 0,
-        "duration": 45318,
-        "mode": "Campanha"
-      }
-    ],
-    "current_campaign": {
-      "id": "camp_1772930715",
-      "difficulty_step": {},
-      "is_active": true
-    },
-    "campaigns": null
-  },
-  {
-    "username": "teste 123",
-    "player_stats": {
-      "matches": 1,
-      "wins": 0,
-      "total_shots": 96,
-      "total_hits": 23,
-      "high_score": 0,
-      "total_score": 0,
-      "higher_hit_sequence": 7,
-      "faster_time": 0,
-      "win_without_losses": false
-    },
-    "medals": [
-      "Capitão"
-    ],
-    "history": [
-      {
-        "win": false,
-        "player_shots": 96,
-        "hits": 23,
-        "higher_hit_sequence": 7,
-        "score": 0,
-        "lost_ships": 6,
-        "killed_ships": 0,
-        "duration": 184843
+        "duration": 98112,
+        "mode": "Dinâmico"
       }
     ],
     "current_campaign": null,
