@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/allanjose001/go-battleship/game/scenes/audio"
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/internal/entity"
 )
@@ -14,9 +15,9 @@ type DynamicMatchService struct {
 }
 
 // Corrigido: recebe attack e aiDelay (mesma semântica de NewMatchService)
-func NewDynamicMatchService(attack *AttackService, aiDelay time.Duration) *DynamicMatchService {
+func NewDynamicMatchService(attack *AttackService, aiDelay time.Duration, ss *audio.SoundService) *DynamicMatchService {
 	return &DynamicMatchService{
-		MatchService: NewMatchService(attack, aiDelay),
+		MatchService: NewMatchService(attack, aiDelay, ss),
 	}
 }
 

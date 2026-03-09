@@ -39,7 +39,7 @@ func (s *DynamicBattleScene) OnEnter(prev Scene, size basic.Size) {
 
 	// Cria o DynamicBattleService ANTES de chamar BattleScene.OnEnter,
 	// para que o pai não instancie um serviço comum (sem ownBoard).
-	svc, err := service.NewDynamicBattleServiceFromMatch(match, s.ctx.IsCampaign)
+	svc, err := service.NewDynamicBattleServiceFromMatch(match, s.ctx.IsCampaign, s.ctx.SoundService)
 	if err == nil {
 		s.dynamicBattleSvc = svc
 		s.battleSvc = svc         // compatibilidade com BattleScene

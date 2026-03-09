@@ -4,6 +4,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/allanjose001/go-battleship/game/scenes/audio"
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/allanjose001/go-battleship/internal/entity"
@@ -38,13 +39,14 @@ var (
 type MatchService struct {
 	attack  *AttackService
 	aiDelay time.Duration
+	ss      *audio.SoundService
 }
 
 // NewMatchService cria um MatchService.
 //
 // attack: pode ser nil; se nil, usa NewAttackService().
 // aiDelay: delay mínimo entre ataques da IA; se <= 0, usa 1s.
-func NewMatchService(attack *AttackService, aiDelay time.Duration) *MatchService {
+func NewMatchService(attack *AttackService, aiDelay time.Duration, ss *audio.SoundService) *MatchService {
 	if aiDelay <= 0 {
 		aiDelay = time.Second
 	}
@@ -54,6 +56,7 @@ func NewMatchService(attack *AttackService, aiDelay time.Duration) *MatchService
 	return &MatchService{
 		attack:  attack,
 		aiDelay: aiDelay,
+		ss:      ss,
 	}
 }
 
@@ -206,6 +209,7 @@ func (s *MatchService) applyPlayerAttack(m *entity.Match, row, col int) (hit boo
 
 func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gameOver bool, ev *entity.AttackEvent) error {
 	if hit {
+		s.ss.PlaySFX("attack", 0.8)
 		// atualiza score de forma limpa
 		m.UpdateScore(true, now)
 	}
@@ -216,6 +220,7 @@ func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gam
 	}
 
 	if !hit {
+		s.ss.PlaySFX("watersplash", 0.8)
 		// passa turno para a IA
 		m.Turn = entity.TurnEnemy
 		m.NextAction = entity.NextActionEnemyAttack

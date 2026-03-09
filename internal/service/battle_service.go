@@ -43,7 +43,7 @@ type battleService struct {
 // Se o Match ainda não foi inicializado (runtime), ele configura a IA e inicia o jogo.
 func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool, ss *audio.SoundService) (BattleService, error) {
 	setupSvc := NewBattleSetupService()
-	matchSvc := NewMatchService(nil, 500*time.Millisecond)
+	matchSvc := NewMatchService(nil, 500*time.Millisecond, ss)
 
 	var aiPlayer *ai.AIPlayer
 
@@ -105,11 +105,11 @@ func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool, ss *audio.S
 	}
 
 	return &battleService{
-		matchSvc:   matchSvc,
-		match:      match,
-		aiPlayer:   aiPlayer,
-		profile:    match.Profile,
-		isCampaign: isCampaign,
+		matchSvc:     matchSvc,
+		match:        match,
+		aiPlayer:     aiPlayer,
+		profile:      match.Profile,
+		isCampaign:   isCampaign,
 		SoundService: ss,
 	}, nil
 }

@@ -188,7 +188,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 			// ✅ CORREÇÃO: Para modo dinâmico, NÃO cria BattleService aqui
 			// A DynamicBattleScene cria o próprio serviço
 			if !isDynamic {
-				svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
+				svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign, s.ctx.SoundService)
 				if err != nil {
 					return
 				}

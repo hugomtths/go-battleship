@@ -30,10 +30,6 @@ func NewGameOverScene(winnerName string, result *entity.MatchResult, actionLabel
 }
 
 func (s *GameOverScene) GetMusic() string {
-	if s.winnerName != "IA" { //-> o matchresult n esta funcionando
-		return "victory"
-	}
-	s.ctx.SoundService.PlaySFX("fah", 0.8)
 	return "loss"
 }
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/allanjose001/go-battleship/game/scenes/audio"
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/internal/ai"
 	"github.com/allanjose001/go-battleship/internal/entity"
@@ -21,10 +22,11 @@ type dynamicBattleService struct {
 }
 
 // NewDynamicBattleServiceFromMatch inicializa o serviço de batalha dinâmica.
-func NewDynamicBattleServiceFromMatch(match *entity.Match, isCampaign bool) (DynamicBattleService, error) {
+func NewDynamicBattleServiceFromMatch(match *entity.Match, isCampaign bool, ss *audio.SoundService) (DynamicBattleService,
+	error) {
 	match.IsDynamicMode = true // Força a flag de modo dinâmico no objeto Match
 	// Usamos DynamicMatchService em vez do MatchService comum
-	dynamicMatchSvc := NewDynamicMatchService(NewAttackService(), 500*time.Millisecond)
+	dynamicMatchSvc := NewDynamicMatchService(NewAttackService(), 500*time.Millisecond, ss)
 
 	var aiPlayer *ai.AIPlayer
 

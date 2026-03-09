@@ -17,7 +17,7 @@ type HomeScreen struct {
 }
 
 func (m *HomeScreen) GetMusic() string {
-	return "loss"
+	return "menus"
 }
 
 func (m *HomeScreen) OnExit(_ Scene) {
