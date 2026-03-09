@@ -24,6 +24,7 @@ func DrawShip(screen *ebiten.Image, b *board.Board, ship *placement.ShipPlacemen
 
 	// Options de desenho usadas para escalar, rotacionar e transladar a imagem.
 	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterNearest
 
 	// Caso 1: navio já está colocado no tabuleiro.
 	if ship.Placed {
