@@ -12,9 +12,9 @@ import (
 )
 
 type GameOverScene struct {
-	winnerName string
-	result     *entity.MatchResult
-	layout     components.LayoutWidget
+	winnerName  string
+	result      *entity.MatchResult
+	layout      components.LayoutWidget
 	actionLabel string
 	onAction    func()
 	StackHandler
@@ -30,7 +30,11 @@ func NewGameOverScene(winnerName string, result *entity.MatchResult, actionLabel
 }
 
 func (s *GameOverScene) GetMusic() string {
-	return "menus"
+	if s.winnerName != "IA" { //-> o matchresult n esta funcionando
+		return "victory"
+	}
+	s.ctx.SoundService.PlaySFX("fah", 0.8)
+	return "loss"
 }
 
 func (s *GameOverScene) OnEnter(prev Scene, size basic.Size) {
@@ -175,7 +179,7 @@ func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
 	// Botão
 	// -------------------------
 
-	label := "Retomar"
+	label := "Voltar"
 	if s.actionLabel != "" {
 		label = s.actionLabel
 	}
@@ -190,7 +194,8 @@ func (s *GameOverScene) setupGameOverLayout(size basic.Size) {
 			if s.onAction != nil {
 				s.onAction()
 			} else {
-				SwitchTo(NewPlacementScene())
+				s.ctx.SoundService.PlaySFX("backclick", 0.8)
+				SwitchTo(&ModeSelectionScene{})
 			}
 		},
 	)

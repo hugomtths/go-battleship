@@ -84,6 +84,7 @@ func (s *SelectProfileScene) buildUI(size basic.Size) {
 		colors.Dark,
 		nil,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			s.stack.Pop()
 		},
 	)
@@ -95,6 +96,7 @@ func (s *SelectProfileScene) buildUI(size basic.Size) {
 		colors.Dark,
 		nil,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			s.stack.Push(&CreateProfileScene{})
 		},
 	)
@@ -160,6 +162,7 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 		colors.PlayerInput,
 		nil,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			s.stack.ctx.Profile = p
 			s.stack.Push(&ProfileScene{})
 
@@ -170,12 +173,15 @@ func (s *SelectProfileScene) createProfileRow(p *entity.Profile, width float32, 
 	deleteBtn := components.NewDeleteIconButton(basic.Point{}, iconSize, func() {
 		_ = service.RemoveProfile(profile.Username)
 		s.profiles = service.GetProfiles()
+		s.ctx.SoundService.PlaySFX("click", 0.8)
 		s.buildUI(s.screenSize)
 	})
 
 	// Ícone de jogar
 	playBtn := components.NewPlayIconButton(basic.Point{}, iconSize, func() {
 		s.stack.ctx.Profile = p
+		s.ctx.SoundService.PlaySFX("click", 0.8)
+
 		s.stack.Push(&ModeSelectionScene{})
 	})
 

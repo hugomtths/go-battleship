@@ -132,6 +132,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 		btnColor,
 		colors.White,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			s.stack.Pop()
 		},
 	)
@@ -145,10 +146,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 		playBtnColor,
 		colors.White,
 		func(b *components.Button) {
-			if !s.svc.AllShipsPlaced() {
-				return
-			}
-
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			factory := service.NewGameService()
 			gs, enemyShips := factory.NewBattleGameState(s.board, s.ships)
 
@@ -255,6 +253,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				btnColor,
 				colors.White,
 				func(b *components.Button) {
+					s.ctx.SoundService.PlaySFX("click", 0.8)
 					s.svc.RandomPlacement()
 				},
 			),
@@ -265,6 +264,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				btnColor,
 				colors.White,
 				func(b *components.Button) {
+					s.ctx.SoundService.PlaySFX("click", 0.8)
 					s.svc.Rotate()
 				},
 			),
@@ -375,6 +375,9 @@ func (s *PlacementScene) OnExit(next Scene) {
 // Aqui atualizamos botões, rótulo e delegamos para o serviço de placement
 // as interações de clique/arraste dos navios.
 func (s *PlacementScene) Update() error {
+
+	s.playButton.SetDisabled(!s.svc.AllShipsPlaced())
+
 	if s.leftButtons != nil {
 		s.leftButtons.Update(basic.Point{})
 	}

@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"bytes"
 	"log"
 	"os"
 	"sync"
@@ -77,6 +78,15 @@ func (m *Music) Stop() {
 	}
 }
 
+func (m *Music) Rewind() {
+	if m.player != nil {
+		err := m.player.Rewind()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 // SetVolume define o volume da musica (0.0 a 1.0)
 func (m *Music) SetVolume(vol float64) {
 	m.lock.Lock()
@@ -134,4 +144,36 @@ func (m *Music) Close() error {
 		return err2
 	}
 	return nil
+}
+
+type SFX struct {
+	data []byte
+	ctx  *audio.Context
+}
+
+func NewSFX(ctx *audio.Context, path string) *SFX {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &SFX{
+		data: data,
+		ctx:  ctx,
+	}
+}
+
+func (s *SFX) Play(vol float64) {
+	stream, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(s.data))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	player, err := s.ctx.NewPlayer(stream)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	player.SetVolume(vol)
+	player.Play()
 }

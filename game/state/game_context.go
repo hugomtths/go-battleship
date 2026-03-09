@@ -7,7 +7,6 @@ import (
 
 // GameContext possui dados de interesse do jogo (tela de jogo, perfis, etc)
 type GameContext struct {
-
 	Profile              *entity.Profile
 	Match                *entity.Match
 	BattleService        BattleService
@@ -16,7 +15,7 @@ type GameContext struct {
 	Difficulty           string
 	IsCampaign           bool
 	IsDynamicMode        bool
-	CanPopOrPush  bool
+	CanPopOrPush         bool
 }
 
 type ContextAware interface {
@@ -31,14 +30,20 @@ func NewGameContext() *GameContext {
 	ss.LoadMusic("loss", "assets/audio/music/loss.ogg")
 	ss.LoadMusic("battle", "assets/audio/music/battle-scene.ogg")
 	ss.LoadMusic("victory", "assets/audio/music/victory.ogg")
+	ss.LoadSFX("attack", "assets/audio/sfx/attack1.ogg")
+	ss.LoadSFX("attack", "assets/audio/sfx/attack2.ogg")
+	ss.LoadSFX("attack", "assets/audio/sfx/attack3.ogg")
+	ss.LoadSFX("watersplash", "assets/audio/sfx/waterSplash1.ogg")
+	ss.LoadSFX("scream", "assets/audio/sfx/scream.ogg")
+	ss.LoadSFX("fah", "assets/audio/sfx/fah.ogg")
+	ss.LoadSFX("click", "assets/audio/sfx/click.ogg")
+	ss.LoadSFX("backclick", "assets/audio/sfx/backclick.ogg")
 
 	return &GameContext{
 		SoundService: ss,
 		CanPopOrPush: true,
 	}
 }
-
-
 
 // BattleService define a interface para interação com a lógica de batalha.
 // Essa interface é duplicada aqui para evitar ciclos de importação com internal/service.

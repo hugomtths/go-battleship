@@ -20,9 +20,8 @@ type DynamicBattleScene struct {
 	BattleScene
 	dynamicBattleSvc service.DynamicBattleService
 	playerInputCtrl  *components.BattleInput
-
-	selectedShip    *entity.Ship
-	selectedShipIdx int // índice no match.PlayerShips para sincronização visual
+	selectedShip     *entity.Ship
+	selectedShipIdx  int // índice no match.PlayerShips para sincronização visual
 }
 
 func NewDynamicBattleScene() *DynamicBattleScene {

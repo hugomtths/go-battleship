@@ -120,6 +120,7 @@ func (c *CampaignScene) refreshUI(size basic.Size) {
 		colors.Dark,
 		colors.White,
 		func(b *components.Button) {
+			c.ctx.SoundService.PlaySFX("backclick", 0.8)
 			c.stack.Pop()
 		},
 	)
@@ -199,6 +200,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 				// Inicia a série de 3 partidas (Partida 1, Placar 0-0)
 				ps := NewPlacementSceneWithProfile(c.ctx.Profile)
 				ps.SetSeriesState(1, 0, 0)
+				c.ctx.SoundService.PlaySFX("click", 0.8)
 				c.stack.Push(ps)
 			},
 		)
@@ -212,6 +214,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 			colors.Dark,
 			colors.White,
 			func(b *components.Button) {
+				c.ctx.SoundService.PlaySFX("click", 0.8)
 				c.stack.Push(NewCampaignHistoryScene(diff, title))
 			},
 		)
@@ -242,6 +245,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 				// Inicia a série de 3 partidas (Partida 1, Placar 0-0)
 				ps := NewPlacementSceneWithProfile(c.ctx.Profile)
 				ps.SetSeriesState(1, 0, 0)
+				c.ctx.SoundService.PlaySFX("click", 0.8)
 				c.stack.Push(ps)
 			},
 		)

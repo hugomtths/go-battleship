@@ -100,8 +100,10 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 				colors.White,
 				func(b *components.Button) {
 					if match.Profile != nil {
+						s.ctx.SoundService.PlaySFX("backclick", 0.8)
 						SwitchTo(NewPlacementSceneWithProfile(match.Profile))
 					} else {
+						s.ctx.SoundService.PlaySFX("click", 0.8)
 						SwitchTo(NewPlacementScene())
 					}
 				},
@@ -113,6 +115,7 @@ func (s *BattleScene) OnEnter(prev Scene, size basic.Size) {
 				colors.Red,
 				colors.White,
 				func(b *components.Button) {
+					s.ctx.SoundService.PlaySFX("backclick", 0.8)
 					SwitchTo(&SelectProfileScene{})
 				},
 			),
@@ -291,8 +294,10 @@ func (s *BattleScene) handleMatchEnd(res *entity.MatchResult) {
 	actionLabel := "Clique para Recomeçar"
 	onAction := func() {
 		if s.ctx != nil && s.ctx.Profile != nil {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			SwitchTo(NewPlacementSceneWithProfile(s.ctx.Profile))
 		} else {
+			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			SwitchTo(NewPlacementScene())
 		}
 	}
@@ -303,7 +308,7 @@ func (s *BattleScene) handleMatchEnd(res *entity.MatchResult) {
 		if isWin {
 			winner = s.ctx.Profile.Username
 		} else {
-			winner = "IA Oponente"
+			winner = "IA"
 		}
 		actionLabel = "Voltar para Campanha"
 		onAction = func() {

@@ -50,6 +50,7 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 		colors.Dark,
 		nil,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			s.stack.Pop()
 		},
 	)
@@ -61,6 +62,7 @@ func (s *CreateProfileScene) OnEnter(prev Scene, size basic.Size) {
 		colors.Dark,
 		nil,
 		func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			username := s.nameField.Text
 
 			profile := entity.Profile{

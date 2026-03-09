@@ -1,6 +1,7 @@
 package audio
 
 import (
+	"math/rand"
 	"sync"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 type SoundService struct {
 	ctx     *audio.Context    //audio context compartilhado
 	musics  map[string]*Music //mapa nome->music
+	sfx     map[string][]*SFX // nome->sfx
 	lock    sync.Mutex        //thread safe
 	current *Music            //musica atual para fade
 	muted   bool
@@ -23,6 +25,7 @@ func NewSoundService() *SoundService {
 	return &SoundService{
 		ctx:    audio.NewContext(sampleRate),
 		musics: make(map[string]*Music),
+		sfx:    make(map[string][]*SFX),
 	}
 }
 
@@ -31,6 +34,13 @@ func (ss *SoundService) LoadMusic(name, path string) {
 	ss.lock.Lock()
 	defer ss.lock.Unlock()
 	ss.musics[name] = NewMusic(ss.ctx, path)
+}
+
+func (ss *SoundService) LoadSFX(name, path string) {
+	ss.lock.Lock()
+	defer ss.lock.Unlock()
+
+	ss.sfx[name] = append(ss.sfx[name], NewSFX(ss.ctx, path))
 }
 
 // Play toca musica //loop=true repete //fade entre musicas
@@ -48,6 +58,28 @@ func (ss *SoundService) Play(name string, vol float64) {
 		newMusic.FadeTo(vol, fadeDuration)
 		ss.current = newMusic
 	}
+}
+
+// roda som com func de so aleatorio paar lista de sfx com mesma key no map
+func (ss *SoundService) PlaySFX(name string, vol float64) {
+	ss.lock.Lock()
+	sfxList := ss.sfx[name]
+	muted := ss.muted
+	ss.lock.Unlock()
+
+	if muted || len(sfxList) == 0 {
+		return
+	}
+
+	var sfx *SFX
+
+	if len(sfxList) == 1 {
+		sfx = sfxList[0]
+	} else {
+		sfx = sfxList[rand.Intn(len(sfxList))]
+	}
+
+	sfx.Play(vol)
 }
 
 // StopCurrent faz fade out da musica atual

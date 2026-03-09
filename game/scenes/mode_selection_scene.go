@@ -36,6 +36,7 @@ func (m *ModeSelectionScene) OnEnter(prev Scene, size basic.Size) {
 				m.ctx.IsDynamicMode = false
 				m.ctx.IsCampaign = false
 			}
+			m.ctx.SoundService.PlaySFX("click", 0.8)
 			m.stack.Push(&DifficultyScene{})
 		},
 	)
@@ -49,6 +50,7 @@ func (m *ModeSelectionScene) OnEnter(prev Scene, size basic.Size) {
 				m.ctx.Profile = m.profile
 			}
 		}
+		m.ctx.SoundService.PlaySFX("click", 0.8)
 		m.stack.Push(&CampaignScene{})
 	})
 
@@ -62,12 +64,14 @@ func (m *ModeSelectionScene) OnEnter(prev Scene, size basic.Size) {
 				m.ctx.Profile = m.profile
 			}
 		}
+		m.ctx.SoundService.PlaySFX("click", 0.8)
 		m.stack.Push(NewPlacementSceneWithProfile(m.profile))
 	})
 
 	backBtn := components.NewButton(basic.Point{}, basic.Size{W: 220, H: 50}, "Voltar", colors.Dark, nil,
 		func(b *components.Button) {
 			if m.ctx.CanPopOrPush {
+				m.ctx.SoundService.PlaySFX("backclick", 0.8)
 				m.stack.Pop()
 			}
 		})

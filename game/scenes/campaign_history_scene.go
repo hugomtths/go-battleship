@@ -128,6 +128,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 
 	if hasPrev {
 		previousHandler = func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			s.currentPage--
 			s.init(size)
 		}
@@ -138,6 +139,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 
 	if hasNext {
 		nextHandler = func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("click", 0.8)
 			s.currentPage++
 			s.init(size)
 		}
@@ -176,6 +178,7 @@ func (s *CampaignHistoryScene) init(size basic.Size) {
 		basic.Center,
 		basic.Center,
 		components.NewButton(basic.Point{}, basic.Size{W: 400, H: 50}, "Voltar", colors.Dark, nil, func(b *components.Button) {
+			s.ctx.SoundService.PlaySFX("backclick", 0.8)
 			s.stack.Pop()
 		}),
 	)

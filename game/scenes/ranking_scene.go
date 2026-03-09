@@ -73,6 +73,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	if hasPrevious {
 		previousHandler = func(bt *components.Button) {
+			m.ctx.SoundService.PlaySFX("click", 0.8)
 			m.currentPage--
 			m.init(screenSize)
 		}
@@ -83,6 +84,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 
 	if hasNext {
 		nextHandler = func(bt *components.Button) {
+			m.ctx.SoundService.PlaySFX("click", 0.8)
 			m.currentPage++
 			m.init(screenSize)
 		}
@@ -201,6 +203,7 @@ func (m *RankingScene) init(screenSize basic.Size) {
 			colors.Dark,
 			nil,
 			func(bt *components.Button) {
+				m.ctx.SoundService.PlaySFX("backclick", 0.8)
 				m.stack.Pop()
 			},
 		),

@@ -28,6 +28,7 @@ func (d *DifficultyScene) init(size basic.Size) {
 		colors.Blue,
 		colors.White,
 		func(b *components.Button) {
+			d.ctx.SoundService.PlaySFX("click", 0.8)
 			d.selectDifficulty("easy")
 		},
 	)
@@ -39,6 +40,7 @@ func (d *DifficultyScene) init(size basic.Size) {
 		colors.Blue,
 		colors.White,
 		func(b *components.Button) {
+			d.ctx.SoundService.PlaySFX("click", 0.8)
 			d.selectDifficulty("medium")
 		},
 	)
@@ -50,6 +52,7 @@ func (d *DifficultyScene) init(size basic.Size) {
 		colors.Blue,
 		colors.White,
 		func(b *components.Button) {
+			d.ctx.SoundService.PlaySFX("click", 0.8)
 			d.selectDifficulty("hard")
 		},
 	)
@@ -61,6 +64,7 @@ func (d *DifficultyScene) init(size basic.Size) {
 		colors.Dark,
 		colors.White,
 		func(b *components.Button) {
+			d.ctx.SoundService.PlaySFX("backclick", 0.8)
 			d.stack.Pop()
 		},
 	)

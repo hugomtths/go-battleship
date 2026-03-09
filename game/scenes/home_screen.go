@@ -59,13 +59,13 @@ func (m *HomeScreen) Draw(screen *ebiten.Image) {
 }
 
 func (m *HomeScreen) toggleMute() {
-	fmt.Println("toggle mute")
-
 	m.stack.ctx.SoundService.ToggleMute()
 
 	if m.stack.ctx.SoundService.IsMuted() {
+		m.ctx.SoundService.PlaySFX("backclick", 0.8)
 		m.muteButton.SetIcon("assets/images/mute.png")
 	} else {
+		m.ctx.SoundService.PlaySFX("click", 0.8)
 		m.muteButton.SetIcon("assets/images/unmute.png")
 	}
 }
@@ -113,6 +113,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
+					m.ctx.SoundService.PlaySFX("click", 0.8)
 					m.stack.Push(&SelectProfileScene{})
 				},
 			),
@@ -124,6 +125,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Dark,
 				nil,
 				func(bt *components.Button) {
+					m.ctx.SoundService.PlaySFX("click", 0.8)
 					m.stack.Push(&RankingScene{})
 				},
 			),
@@ -135,6 +137,7 @@ func (m *HomeScreen) init(screenSize basic.Size) error {
 				colors.Red,
 				nil,
 				func(bt *components.Button) {
+					m.ctx.SoundService.PlaySFX("backclick", 0.8)
 					fmt.Println("sair")
 					m.stack.Pop() //faz terminator em game
 				},
