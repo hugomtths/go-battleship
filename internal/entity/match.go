@@ -100,19 +100,24 @@ type Match struct {
 	// Visão lógica do jogador para a IA (entity.Board é o que seu AIPlayer ataca)
 	PlayerEntityBoard *Board `json:"-"`
 	PlayerFleet       *Fleet `json:"-"`
+
+	// Visão lógica da IA (usado no modo dinâmico para estratégias de evasão)
+	EnemyEntityBoard *Board `json:"-"`
+	EnemyFleet       *Fleet `json:"-"`
 }
 
-func NewMatch(id string, difficulty string, playerBoard, aiBoard *board.Board, ships []*placement.ShipPlacement, profile *Profile) *Match {
+func NewMatch(id string, difficulty string, playerBoard, aiBoard *board.Board, ships []*placement.ShipPlacement, profile *Profile, isDynamic bool) *Match {
 	return &Match{
-		ID:          id,
-		Difficulty:  difficulty,
-		Status:      MatchStatusWaiting,
-		Turn:        TurnPlayer,
-		Winner:      "",
-		PlayerBoard: playerBoard,
-		EnemyBoard:  aiBoard,
-		PlayerShips: ships,
-		Profile:     profile,
+		ID:            id,
+		Difficulty:    difficulty,
+		Status:        MatchStatusWaiting,
+		Turn:          TurnPlayer,
+		Winner:        "",
+		PlayerBoard:   playerBoard,
+		EnemyBoard:    aiBoard,
+		PlayerShips:   ships,
+		Profile:       profile,
+		IsDynamicMode: isDynamic,
 	}
 }
 

@@ -157,7 +157,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				diff = s.stack.ctx.Difficulty
 			}
 
-			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile)
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile, s.stack.ctx != nil && s.stack.ctx.IsDynamicMode)
 
 			svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
 			if err != nil {
@@ -173,7 +173,7 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 			// Configura a cena de batalha com o estado da série
 			var battleScene Scene
 			if s.stack.ctx != nil && s.stack.ctx.IsDynamicMode {
-				//battleScene = NewDynamicBattleScene()
+				battleScene = NewDynamicBattleScene()
 			} else {
 				bs := NewBattleScene()
 				if s.ctx != nil && s.ctx.IsCampaign {

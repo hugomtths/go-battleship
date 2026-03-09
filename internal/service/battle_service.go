@@ -110,7 +110,9 @@ func (s *battleService) HandlePlayerClick(row, col int) (*entity.MatchResult, er
 		// Salva a dificuldade da partida
 		res.Difficulty = s.match.Difficulty
 		// Salva o modo da partida
-		if s.isCampaign {
+		if s.match.IsDynamicMode {
+			res.Mode = "Dinâmico"
+		} else if s.isCampaign {
 			res.Mode = "Campanha"
 		} else {
 			res.Mode = "Clássica"
@@ -150,8 +152,10 @@ func (s *battleService) HandleEnemyTurn() (*entity.MatchResult, error) {
 	if ev.GameOver {
 		res := s.matchSvc.ResultForPlayer(s.match)
 		res.Difficulty = s.match.Difficulty
-		
-		if s.isCampaign {
+
+		if s.match.IsDynamicMode {
+			res.Mode = "Dinâmico"
+		} else if s.isCampaign {
 			res.Mode = "Campanha"
 		} else {
 			res.Mode = "Clássica"
