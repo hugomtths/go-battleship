@@ -14,6 +14,11 @@ import (
 const (
 	firePath = "assets/images/Fire.gif"
 	missPath = "assets/images/Ponto que já foi atingido 1.png"
+
+	sunkShip1Path = "assets/images/1 slot 1 afund.png"
+	sunkShip2Path = "assets/images/3 slot 2 afund.png"
+	sunkShip3Path = "assets/images/Frame 400 afund.png"
+	sunkShip4Path = "assets/images/NAVIO 4 SLOTS 1 afund.png"
 )
 
 // LoadFireAnimation:
@@ -59,6 +64,38 @@ func LoadHitImage() (*ebiten.Image, error) {
 // - Usada no renderer para desenhar marcadores de jogadas
 func LoadMissImage() (*ebiten.Image, error) {
 	img, _, err := ebitenutil.NewImageFromFile(missPath)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
+}
+
+func LoadSunkShip1() (*ebiten.Image, error) {
+	img, _, err := ebitenutil.NewImageFromFile(sunkShip1Path)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
+}
+
+func LoadSunkShip2() (*ebiten.Image, error) {
+	img, _, err := ebitenutil.NewImageFromFile(sunkShip2Path)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
+}
+
+func LoadSunkShip3() (*ebiten.Image, error) {
+	img, _, err := ebitenutil.NewImageFromFile(sunkShip3Path)
+	if err != nil {
+		return nil, err
+	}
+	return img, nil
+}
+
+func LoadSunkShip4() (*ebiten.Image, error) {
+	img, _, err := ebitenutil.NewImageFromFile(sunkShip4Path)
 	if err != nil {
 		return nil, err
 	}
