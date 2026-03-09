@@ -61,7 +61,7 @@ func NewMatchService(attack *AttackService, aiDelay time.Duration) *MatchService
 // Como o Match não é persistido, este método apenas devolve um novo Match.
 func (s *MatchService) Create(id string, difficulty string) *entity.Match {
 	// Passamos a dificuldade para o construtor da entidade
-	return entity.NewMatch(id, difficulty, nil, nil, nil, nil, false)
+	return entity.NewMatch(id, difficulty, nil, nil, nil, nil, nil, false)
 }
 
 // Start inicializa o Match e injeta referências runtime necessárias para jogar.
@@ -77,7 +77,9 @@ func (s *MatchService) Start(
 	playerBoard *board.Board,
 	enemyBoard *board.Board,
 	playerEntityBoard *entity.Board,
+	enemyEntityBoard *entity.Board,
 	playerFleet *entity.Fleet,
+	enemyFleet *entity.Fleet,
 	enemyShipCells int,
 	playerShipCells int,
 ) error {
@@ -92,7 +94,9 @@ func (s *MatchService) Start(
 	m.PlayerBoard = playerBoard
 	m.EnemyBoard = enemyBoard
 	m.PlayerEntityBoard = playerEntityBoard
+	m.EnemyEntityBoard = enemyEntityBoard
 	m.PlayerFleet = playerFleet
+	m.EnemyFleet = enemyFleet
 
 	// totais para condição de vitória
 	m.TotalEnemyShipCells = enemyShipCells
@@ -187,7 +191,7 @@ func (s *MatchService) validatePlayerAttack(m *entity.Match, row, col int) error
 
 func (s *MatchService) applyPlayerAttack(m *entity.Match, row, col int) (hit bool, gameOver bool) {
 	m.PlayerShots, m.PlayerHits, hit, gameOver =
-		s.attack.PlayerAttack(m.EnemyBoard, row, col, m.PlayerShots, m.PlayerHits, m.TotalEnemyShipCells)
+		s.attack.PlayerAttack(m.EnemyBoard, m.EnemyEntityBoard, row, col, m.PlayerShots, m.PlayerHits, m.TotalEnemyShipCells)
 
 	if hit {
 		m.PlayerHitStreak++
