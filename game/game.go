@@ -1,7 +1,11 @@
 package game
 
 import (
+	"fmt"
+	"image"
+	"image/png"
 	"log"
+	"os"
 
 	"github.com/allanjose001/go-battleship/game/components"
 	"github.com/allanjose001/go-battleship/game/state"
@@ -57,4 +61,25 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 func (g *Game) Layout(_, _ int) (int, int) {
 	return int(windowSize.W), int(windowSize.H)
+}
+
+// SetGameWindowIcon carrega um PNG e define como ícone da janela do jogo
+func SetGameWindowIcon(path string) error {
+	f, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if cerr := f.Close(); cerr != nil {
+			fmt.Println("erro ao fechar arquivo:", cerr)
+		}
+	}()
+
+	img, err := png.Decode(f)
+	if err != nil {
+		return err
+	}
+
+	ebiten.SetWindowIcon([]image.Image{img})
+	return nil
 }

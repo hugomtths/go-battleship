@@ -7,14 +7,16 @@ import (
 )
 
 func main() {
-
 	bootstrap.InitRandom()
 
 	g := game.NewGame()
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
-	err := ebiten.RunGame(g)
-	if err != nil {
+	if err := game.SetGameWindowIcon("assets/icons/skull.png"); err != nil {
+		panic(err)
+	}
+
+	if err := ebiten.RunGame(g); err != nil {
 		panic(err)
 	}
 }
