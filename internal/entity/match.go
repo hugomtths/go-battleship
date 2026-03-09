@@ -88,6 +88,9 @@ type Match struct {
 	TotalEnemyShipCells  int `json:"total_enemy_ship_cells"`
 	TotalPlayerShipCells int `json:"total_player_ship_cells"`
 
+	LastAttackAt time.Time `json:"-"`     // momento do último ataque do player
+	Score        int       `json:"score"` // score atual atualizado a cada tiro
+
 	// Estado runtime (não persistir)
 	PlayerBoard *board.Board               `json:"-"`
 	EnemyBoard  *board.Board               `json:"-"`
@@ -177,7 +180,7 @@ func (m *Match) Result() MatchResult {
 		}
 	}
 
-	score := 0 // ajuste quando você definir fórmula
+	score := m.Score
 
 	return MatchResult{
 		Win:               win,
@@ -189,4 +192,64 @@ func (m *Match) Result() MatchResult {
 		KilledShips:       killedShips,
 		Duration:          dur,
 	}
+}
+
+func (m *Match) UpdateScore(hit bool, now time.Time) {
+	if !hit {
+		return
+	}
+
+	const (
+		basePoints    = 10
+		hitBonus      = 5
+		streakFactor  = 10
+		maxDeltaSec   = 5   // limite de 5 segundos entre tiros
+		maxDuration   = 300 // 5 minutos em segundos
+		minMultiplier = 0.1 // mínimo de pontos
+	)
+
+	// --- tempo desde o último ataque ---
+	deltaSec := 1.0
+	if !m.LastAttackAt.IsZero() {
+		deltaSec = now.Sub(m.LastAttackAt).Seconds()
+		if deltaSec <= 0 {
+			deltaSec = 0.1
+		}
+	}
+	if deltaSec > maxDeltaSec {
+		deltaSec = maxDeltaSec
+	}
+
+	// multiplicador entre tiros (0s = máximo, 5s = mínimo)
+	deltaMultiplier := 1 + (maxDeltaSec-deltaSec)/maxDeltaSec
+
+	// --- tempo total da partida ---
+	elapsedSec := 1.0
+	if !m.StartedAt.IsZero() {
+		elapsedSec = now.Sub(m.StartedAt).Seconds()
+		if elapsedSec <= 0 {
+			elapsedSec = 1
+		}
+	}
+	if elapsedSec > maxDuration {
+		elapsedSec = maxDuration
+	}
+
+	// multiplicador de duração, linear até 5 minutos, mínimo fixo
+	durationMultiplier := 1 - (elapsedSec/maxDuration)*(1-minMultiplier)
+	if durationMultiplier < minMultiplier {
+		durationMultiplier = minMultiplier
+	}
+
+	// multiplicador de sequência
+	streakMultiplier := 1 + float64(m.PlayerHitStreak)*float64(streakFactor)/100.0
+
+	// cálculo final
+	points := float64(basePoints+hitBonus) * streakMultiplier * deltaMultiplier * durationMultiplier
+	if points < 1 {
+		points = 1
+	}
+
+	m.Score += int(points)
+	m.LastAttackAt = now
 }

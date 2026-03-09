@@ -60,8 +60,8 @@ func NewMatchService(attack *AttackService, aiDelay time.Duration) *MatchService
 // Create cria um Match em memória.
 // Como o Match não é persistido, este método apenas devolve um novo Match.
 func (s *MatchService) Create(id string, difficulty string) *entity.Match {
-    // Passamos a dificuldade para o construtor da entidade
-    return entity.NewMatch(id, difficulty, nil, nil, nil, nil)
+	// Passamos a dificuldade para o construtor da entidade
+	return entity.NewMatch(id, difficulty, nil, nil, nil, nil)
 }
 
 // Start inicializa o Match e injeta referências runtime necessárias para jogar.
@@ -206,11 +206,16 @@ func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gam
 		return nil
 	}
 
-	if !hit {
+	if hit {
+		// atualiza score de forma limpa
+		m.UpdateScore(true, now)
+	} else {
+		// passa turno para a IA
 		m.Turn = entity.TurnEnemy
 		m.NextAction = entity.NextActionEnemyAttack
 		m.NextActionAt = now.Add(s.aiDelay)
 	}
+
 	return nil
 }
 
