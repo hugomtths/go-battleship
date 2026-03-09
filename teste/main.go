@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/allanjose001/go-battleship/internal/ai"
-	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/allanjose001/go-battleship/internal/entity"
+	"github.com/allanjose001/go-battleship/internal/service"
 )
 
 func totalShipCells(f *entity.Fleet) int {
@@ -61,13 +61,52 @@ func printHelp() {
 func runEnemyTurns(match *entity.Match, aiPlayer *ai.AIPlayer, playerEntityBoard *entity.Board, playerFleet *entity.Fleet) {
 	for match.Turn == entity.TurnEnemy && !match.IsFinished() {
 
-		// chama a IA diretamente — sem sincronização visual
+		// snapshot das células já atacadas ANTES do ataque
+		type cell struct{ r, c int }
+		var attackedBefore []cell
+		for r := 0; r < entity.BoardSize; r++ {
+			for c := 0; c < entity.BoardSize; c++ {
+				if entity.IsAttacked(playerEntityBoard.Positions[r][c]) {
+					attackedBefore = append(attackedBefore, cell{r, c})
+				}
+			}
+		}
+
 		aiPlayer.Attack(playerEntityBoard)
 
-		fmt.Println("[IA] atacou. Estado do seu tabuleiro:")
+		// descobre a célula recém-atacada e se foi hit ou miss
+		wasAttacked := func(r, c int) bool {
+			for _, p := range attackedBefore {
+				if p.r == r && p.c == c {
+					return true
+				}
+			}
+			return false
+		}
+
+		hit := false
+		for r := 0; r < entity.BoardSize; r++ {
+			for c := 0; c < entity.BoardSize; c++ {
+				if entity.IsAttacked(playerEntityBoard.Positions[r][c]) && !wasAttacked(r, c) {
+					ship := entity.GetShipReference(playerEntityBoard.Positions[r][c])
+					aiPlayer.AdjustStrategy(playerEntityBoard, r, c, ship)
+					if ship != nil {
+						hit = true
+						fmt.Printf("[IA] Acertou em (%d,%d) — %s!\n", r, c, ship.Name)
+						if ship.IsDestroyed() {
+							fmt.Printf("[IA] %s destruído!\n", ship.Name)
+						}
+					} else {
+						fmt.Printf("[IA] Errou em (%d,%d).\n", r, c)
+					}
+					goto done
+				}
+			}
+		}
+	done:
+		fmt.Println("[IA] Estado do seu tabuleiro:")
 		entity.PrintBoard(playerEntityBoard)
 
-		// verifica vitória da IA
 		if playerFleet.IsFleetDestroyed() {
 			fmt.Println("*** IA venceu! Game Over. ***")
 			match.Status = entity.MatchStatusFinished
@@ -75,9 +114,11 @@ func runEnemyTurns(match *entity.Match, aiPlayer *ai.AIPlayer, playerEntityBoard
 			return
 		}
 
-		// devolve turno ao jogador após 1 ataque (comportamento padrão easy)
-		match.Turn = entity.TurnPlayer
-		match.ClearNextAction()
+		// hit: IA continua — miss: devolve turno ao jogador
+		if !hit {
+			match.Turn = entity.TurnPlayer
+			match.ClearNextAction()
+		}
 	}
 }
 
@@ -86,7 +127,7 @@ func main() {
 
 	// boards lógicos — 1 por jogador, sem board visual
 	playerEntityBoard := &entity.Board{}
-	enemyEntityBoard := &entity.Board{}
+	enemyEntityBoard := &entity.Board{} // <- tabuleiro DA IA (onde ela posiciona navios)
 
 	playerFleet := entity.NewFleet()
 	enemyFleet := entity.NewFleet()
@@ -94,7 +135,9 @@ func main() {
 	service.PositionShipsRandomly(enemyEntityBoard, enemyFleet)
 	service.PositionShipsRandomly(playerEntityBoard, playerFleet)
 
-	aiPlayer := ai.NewHardAIPlayer(playerFleet)
+	// ownBoard = enemyEntityBoard (tabuleiro onde A IA tem seus navios)
+	// enemyFleet no contexto da IA = playerFleet (frota que ELA ataca)
+	aiPlayer := ai.NewDynamicAIPlayer(playerFleet, enemyEntityBoard)
 
 	// Create apenas cria o match em memória
 	match := dynSvc.Create("test-match", "easy")
@@ -135,9 +178,11 @@ func main() {
 			printHelp()
 
 		case "show":
+			fmt.Println("Tabuleiro do oponente (IA):")
 			entity.PrintBoard(enemyEntityBoard)
 
 		case "showplayer":
+			fmt.Println("Seu tabuleiro:")
 			entity.PrintBoard(playerEntityBoard)
 
 		case "list":
@@ -179,6 +224,9 @@ func main() {
 				}
 				entity.PrintBoard(enemyEntityBoard)
 
+				// Notifica a IA que ela foi atingida nesta posição
+				aiPlayer.RegisterIncomingHit(r, c)
+
 				if enemyFleet.IsFleetDestroyed() {
 					fmt.Println("*** Jogador venceu! Game Over. ***")
 					match.Status = entity.MatchStatusFinished
@@ -189,7 +237,6 @@ func main() {
 				fmt.Printf("[Jogador] Miss em (%d,%d).\n", r, c)
 				entity.PrintBoard(enemyEntityBoard)
 
-				// miss: passa turno para IA
 				match.Turn = entity.TurnEnemy
 				match.NextAction = entity.NextActionEnemyAttack
 

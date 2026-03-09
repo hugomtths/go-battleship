@@ -9,7 +9,7 @@ import (
 type FullLineStrategy struct{}
 
 func (s *FullLineStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
-	fmt.Println("fullLineStrategy usada")
+	fmt.Println("chegou em fullLineStrategy")
 
 	if len(ai.priorityQueue) == 0 {
 		return false

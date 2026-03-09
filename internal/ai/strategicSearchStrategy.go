@@ -6,7 +6,7 @@ import "fmt"
 type StrategicSearchStrategy struct{}
 
 func (s *StrategicSearchStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
-	fmt.Println("passou por SSS")
+	fmt.Println("chegou em StrategicShearch")
 	if len(ai.priorityQueue) != 0 {
 		fmt.Println("SSS: skipping because priorityQueue not empty")
 		return false

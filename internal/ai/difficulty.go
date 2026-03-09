@@ -32,3 +32,18 @@ func NewHardAIPlayer(enemyFleet *entity.Fleet) *AIPlayer {
 		},
 	}
 }
+
+func NewDynamicAIPlayer(enemyFleet *entity.Fleet, ownBoard *entity.Board) *AIPlayer {
+	return &AIPlayer{
+		enemyFleet:   enemyFleet,
+		ownBoard:     ownBoard,
+		evasionQueue: make([]*entity.Ship, 0), // inicializa fila vazia
+		Strategies: []Strategy{
+			&EvasionStrategy{},
+			&StrategicSearchStrategy{},
+			&FullLineStrategy{},
+			&DiscoveryStrategy{},
+			&RandomStrategy{},
+		},
+	}
+}

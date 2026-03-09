@@ -12,7 +12,50 @@ type AIPlayer struct {
 	Strategies    []Strategy
 	enemyFleet    *entity.Fleet
 	chaseMode     bool
+	ownBoard      *entity.Board
+	evasionQueue  []*entity.Ship // fila de navios que precisam ser movidos
 }
+
+func (ai *AIPlayer) SetOwnBoard(b *entity.Board) {
+	ai.ownBoard = b
+}
+
+// RegisterIncomingHit é chamado quando a IA é atingida.
+// Resolve o navio imediatamente (enquanto o board ainda está íntegro)
+// e o enfileira para evasão no próximo turno da IA.
+func (ai *AIPlayer) RegisterIncomingHit(row, col int) {
+	if ai.ownBoard == nil {
+		return
+	}
+	pos := ai.ownBoard.Positions[row][col]
+	ship := entity.GetShipReference(pos)
+	if ship == nil {
+		return
+	}
+	// Só enfileira se o navio ainda não está destruído
+	// E se ainda não está na fila (evita duplicatas)
+	if ship.IsDestroyed() {
+		fmt.Printf("RegisterIncomingHit: navio '%s' destruído, sem evasão\n", ship.Name)
+		return
+	}
+	for _, s := range ai.evasionQueue {
+		if s == ship {
+			return // já enfileirado
+		}
+	}
+	fmt.Printf("RegisterIncomingHit: enfileirando '%s' para evasão\n", ship.Name)
+	ai.evasionQueue = append(ai.evasionQueue, ship)
+}
+
+func (ai *AIPlayer) dequeueEvasion() *entity.Ship {
+	if len(ai.evasionQueue) == 0 {
+		return nil
+	}
+	ship := ai.evasionQueue[0]
+	ai.evasionQueue = ai.evasionQueue[1:]
+	return ship
+}
+
 
 func (ai *AIPlayer) Attack(enemyBoard *entity.Board) {
 	for _, strat := range ai.Strategies { // verifica estrategias disponiveis
@@ -63,7 +106,7 @@ func (ai *AIPlayer) FleetShipDestroyed(ship *entity.Ship) {
 			return
 		}
 	}
-	// fallback: marcar first ship with same size that's not destroyed
+	// fallback: marcar primeiro barco com o mesmo tamanho que não foi destruido
 	for i, s := range ai.enemyFleet.Ships {
 		if s != nil && s.Size == ship.Size && !s.IsDestroyed() {
 			ai.enemyFleet.Ships[i].HitCount = s.Size
@@ -186,7 +229,7 @@ func (ai *AIPlayer) AddToPriorityQueue(row, col int) {
 	if !ai.IsValid(row, col) {
 		return
 	}
-	// dedupe
+
 	for _, p := range ai.priorityQueue {
 		if p.row == row && p.col == col {
 			return

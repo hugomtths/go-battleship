@@ -6,7 +6,7 @@ import "fmt"
 type DiscoveryStrategy struct{}
 
 func (s *DiscoveryStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
-	fmt.Println("discoveryStrategy usada")
+	fmt.Println("chegou em discoveryStrategy")
 
 	if ai.IsChasing() {
 		return false
