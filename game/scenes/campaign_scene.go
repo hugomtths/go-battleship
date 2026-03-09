@@ -9,6 +9,7 @@ import (
 	"github.com/allanjose001/go-battleship/game/components/basic"
 	"github.com/allanjose001/go-battleship/game/components/basic/colors"
 	"github.com/allanjose001/go-battleship/internal/entity"
+	"github.com/allanjose001/go-battleship/internal/service"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -189,6 +190,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 						DifficultyStep: make(map[string]entity.MatchResult),
 						IsActive:       true,
 					}
+					_ = service.UpdateProfile(*c.ctx.Profile)
 				}
 				// Configura dificuldade no contexto e vai para posicionamento
 				c.ctx.SetDifficulty(diff)
@@ -231,6 +233,7 @@ func (c *CampaignScene) createStageCard(title, diff, state string, res *entity.M
 						DifficultyStep: make(map[string]entity.MatchResult),
 						IsActive:       true,
 					}
+					_ = service.UpdateProfile(*c.ctx.Profile)
 				}
 				// Configura dificuldade no contexto e vai para posicionamento
 				c.ctx.SetDifficulty(diff)

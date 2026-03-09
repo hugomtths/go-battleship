@@ -201,15 +201,17 @@ func (s *MatchService) applyPlayerAttack(m *entity.Match, row, col int) (hit boo
 }
 
 func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gameOver bool, ev *entity.AttackEvent) error {
+	if hit {
+		// atualiza score de forma limpa
+		m.UpdateScore(true, now)
+	}
+
 	if gameOver {
 		s.finishAndFillWinner(m, now, entity.TurnPlayer, ev)
 		return nil
 	}
 
-	if hit {
-		// atualiza score de forma limpa
-		m.UpdateScore(true, now)
-	} else {
+	if !hit {
 		// passa turno para a IA
 		m.Turn = entity.TurnEnemy
 		m.NextAction = entity.NextActionEnemyAttack
