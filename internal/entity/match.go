@@ -95,6 +95,7 @@ type Match struct {
 	PlayerBoard *board.Board               `json:"-"`
 	EnemyBoard  *board.Board               `json:"-"`
 	PlayerShips []*placement.ShipPlacement `json:"-"`
+	EnemyShips  []*placement.ShipPlacement `json:"-"`
 	Profile     *Profile                   `json:"-"`
 
 	// Visão lógica do jogador para a IA (entity.Board é o que seu AIPlayer ataca)
@@ -106,7 +107,7 @@ type Match struct {
 	EnemyFleet       *Fleet `json:"-"`
 }
 
-func NewMatch(id string, difficulty string, playerBoard, aiBoard *board.Board, ships []*placement.ShipPlacement, profile *Profile, isDynamic bool) *Match {
+func NewMatch(id string, difficulty string, playerBoard, aiBoard *board.Board, ships, enemyShips []*placement.ShipPlacement, profile *Profile, isDynamic bool) *Match {
 	return &Match{
 		ID:            id,
 		Difficulty:    difficulty,
@@ -116,6 +117,7 @@ func NewMatch(id string, difficulty string, playerBoard, aiBoard *board.Board, s
 		PlayerBoard:   playerBoard,
 		EnemyBoard:    aiBoard,
 		PlayerShips:   ships,
+		EnemyShips:    enemyShips,
 		Profile:       profile,
 		IsDynamicMode: isDynamic,
 	}

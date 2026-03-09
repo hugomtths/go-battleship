@@ -3,6 +3,7 @@ package components
 import (
 	"github.com/allanjose001/go-battleship/game/shared/board"
 	"github.com/allanjose001/go-battleship/game/shared/placement"
+	"github.com/allanjose001/go-battleship/internal/entity"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -33,7 +34,7 @@ func NewBattleBoardView(fireAnimation *FireAnimation, hitImage, missImage *ebite
 // - screen: A imagem de destino onde o desenho será feito.
 // - b: O tabuleiro lógico (dados das células).
 // - ships: A lista de navios a serem desenhados (pode ser nil para o tabuleiro do inimigo, onde não vemos os navios).
-func (v *BattleBoardView) DrawBoard(screen *ebiten.Image, b *board.Board, ships []*placement.ShipPlacement) {
+func (v *BattleBoardView) DrawBoard(screen *ebiten.Image, b *board.Board, ships []*placement.ShipPlacement, fleet *entity.Fleet, entityBoard *entity.Board, hideUndestroyed bool) {
 	// Se o tabuleiro for nil, não há nada para desenhar.
 	if b == nil {
 		return
@@ -41,23 +42,32 @@ func (v *BattleBoardView) DrawBoard(screen *ebiten.Image, b *board.Board, ships 
 
 	// 1. Desenha navios, se houver uma lista de navios fornecida.
 	// Isso geralmente é usado apenas para o tabuleiro do próprio jogador.
-	if ships != nil {
-		for _, ship := range ships {
+	if ships != nil && fleet != nil {
+		for i, ship := range ships {
 			// Só desenha se o navio estiver marcado como posicionado.
 			if ship.Placed {
-				// DrawShip é uma função auxiliar do pacote components que desenha um único navio.
-				DrawShip(screen, b, ship, false, ship.Orientation)
+				// Verifica se o navio correspondente na frota lógica está afundado.
+				if i < len(fleet.Ships) && fleet.Ships[i].IsDestroyed() {
+					// Se estiver afundado, usa a imagem de navio afundado.
+					originalImage := ship.Image
+					ship.Image = ship.SunkImage
+					DrawShip(screen, b, ship, false, ship.Orientation)
+					ship.Image = originalImage // Restaura para não afetar outros estados
+				} else if !hideUndestroyed {
+					// Caso contrário, usa a imagem normal.
+					DrawShip(screen, b, ship, false, ship.Orientation)
+				}
 			}
 		}
 	}
 
 	// 2. Desenha marcadores (hits/misses) sobre o tabuleiro.
 	// Isso acontece para ambos os jogadores (mostra onde já atiraram).
-	v.DrawMarkers(screen, b)
+	v.DrawMarkers(screen, b, entityBoard)
 }
 
 // DrawMarkers itera sobre todas as células do tabuleiro e desenha os indicadores de tiro.
-func (v *BattleBoardView) DrawMarkers(screen *ebiten.Image, b *board.Board) {
+func (v *BattleBoardView) DrawMarkers(screen *ebiten.Image, b *board.Board, entityBoard *entity.Board) {
 	if b == nil {
 		return
 	}
@@ -65,6 +75,7 @@ func (v *BattleBoardView) DrawMarkers(screen *ebiten.Image, b *board.Board) {
 	cellSize := b.Size / float64(board.Cols)
 	// reutiliza uma única instância de DrawImageOptions — zero alocações por frame
 	op := &ebiten.DrawImageOptions{}
+	op.Filter = ebiten.FilterNearest
 
 	for i := 0; i < board.Rows; i++ {
 		for j := 0; j < board.Cols; j++ {
@@ -72,6 +83,16 @@ func (v *BattleBoardView) DrawMarkers(screen *ebiten.Image, b *board.Board) {
 
 			if cell.State != board.Hit && cell.State != board.Miss {
 				continue
+			}
+
+			// Se a célula for um Hit, verifica se o navio naquela posição está afundado.
+			// Se estiver afundado, não desenhamos o fogo (fireAnimation/hitImage).
+			if cell.State == board.Hit && entityBoard != nil {
+				pos := entityBoard.Positions[i][j]
+				ship := entity.GetShipReference(pos)
+				if ship != nil && ship.IsDestroyed() {
+					continue // Pula o desenho do fogo se o navio estiver afundado
+				}
 			}
 
 			x := b.X + float64(j)*cellSize

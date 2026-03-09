@@ -45,15 +45,32 @@ func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleServ
 	var aiPlayer *ai.AIPlayer
 
 	if match.PlayerEntityBoard == nil {
-		var entityBoard *entity.Board
-		var fleet *entity.Fleet
+		// Constrói a lógica do player
+		playerEntityBoard, playerFleet := setupSvc.BuildEntityBoard(match.PlayerShips)
 
-		aiPlayer, entityBoard, fleet = setupSvc.InitBattleAI(match.Difficulty, match.PlayerShips)
+		// Constrói a lógica do inimigo (usando os navios da IA!)
+		enemyEntityBoard, enemyFleet := setupSvc.BuildEntityBoard(match.EnemyShips)
 
-		totalCells := 0
+		// Inicializa a IA passando a frota do jogador (para ela saber o que atacar)
+		aiPlayer = setupSvc.InitBattleAI(match.Difficulty, playerFleet)
+
+		// Preenche os campos no Match
+		match.PlayerEntityBoard = playerEntityBoard
+		match.PlayerFleet = playerFleet
+		match.EnemyEntityBoard = enemyEntityBoard
+		match.EnemyFleet = enemyFleet
+
+		totalPlayerCells := 0
 		for _, ship := range match.PlayerShips {
 			if ship != nil {
-				totalCells += ship.Size
+				totalPlayerCells += ship.Size
+			}
+		}
+
+		totalEnemyCells := 0
+		for _, ship := range match.EnemyShips {
+			if ship != nil {
+				totalEnemyCells += ship.Size
 			}
 		}
 
@@ -62,10 +79,12 @@ func NewBattleServiceFromMatch(match *entity.Match, isCampaign bool) (BattleServ
 			time.Now(),
 			match.PlayerBoard,
 			match.EnemyBoard,
-			entityBoard,
-			fleet,
-			totalCells,
-			totalCells,
+			playerEntityBoard,
+			enemyEntityBoard,
+			playerFleet,
+			enemyFleet,
+			totalEnemyCells,
+			totalPlayerCells,
 		); err != nil {
 			return nil, err
 		}

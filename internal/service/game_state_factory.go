@@ -21,7 +21,7 @@ func NewGameService() *GameService {
 // - Reaproveita o board do jogador e clona as dimensões para o board da IA
 // - Posiciona os navios da IA no tabuleiro dela (visual) via setup
 // - Devolve um GameState pronto para a BattleScene consumir
-func (g *GameService) NewBattleGameState(playerBoard *board.Board, ships []*placement.ShipPlacement) *state.GameState {
+func (g *GameService) NewBattleGameState(playerBoard *board.Board, ships []*placement.ShipPlacement) (*state.GameState, []*placement.ShipPlacement) {
 	gs := state.NewGameState()
 	gs.PlayerBoard = playerBoard
 	gs.PlayerShips = ships
@@ -30,7 +30,7 @@ func (g *GameService) NewBattleGameState(playerBoard *board.Board, ships []*plac
 	gs.AIBoard.Y = playerBoard.Y
 	gs.AIBoard.Size = playerBoard.Size
 
-	setup.RandomlyPlaceAIShips(gs.AIBoard)
+	aiShips := setup.RandomlyPlaceAIShips(gs.AIBoard)
 
-	return gs
+	return gs, aiShips
 }

@@ -20,8 +20,9 @@ func NewAttackService() *AttackService {
 // - Ignora células já atacadas
 // - Conta tentativa
 // - Marca Hit/Miss conforme estado da célula
+// - Atualiza o entityBoard da IA (contabiliza dano nos navios)
 // - Retorna indicadores de acerto e fim de jogo usando totalShipCells
-func (s *AttackService) PlayerAttack(aiBoard *board.Board, row, col int, attempts, hits, totalShipCells int) (int, int, bool, bool) {
+func (s *AttackService) PlayerAttack(aiBoard *board.Board, aiEntityBoard *entity.Board, row, col int, attempts, hits, totalShipCells int) (int, int, bool, bool) {
 	cell := &aiBoard.Cells[row][col]
 
 	if cell.State == board.Hit || cell.State == board.Miss {
@@ -31,6 +32,11 @@ func (s *AttackService) PlayerAttack(aiBoard *board.Board, row, col int, attempt
 	attempts++
 
 	if cell.State == board.Ship {
+		// Registra o ataque na entidade lógica (navio) para atualizar contadores de dano
+		if aiEntityBoard != nil {
+			aiEntityBoard.AttackPositionA(row, col)
+		}
+
 		cell.State = board.Hit
 		hits++
 		if hits >= totalShipCells {

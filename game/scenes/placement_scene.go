@@ -103,13 +103,15 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 	img3, _, _ := ebitenutil.NewImageFromFile("assets/images/Frame 400.png")
 	img4, _, _ := ebitenutil.NewImageFromFile("assets/images/NAVIO 4 SLOTS 1.png")
 
+	battleAssets := LoadBattleAssets()
+
 	ships := []*placement.ShipPlacement{
-		{Image: img3, Size: 6, ListX: 800, ListY: 100},
-		{Image: img3, Size: 6, ListX: 800, ListY: 160},
-		{Image: img4, Size: 4, ListX: 800, ListY: 250},
-		{Image: img4, Size: 4, ListX: 800, ListY: 320},
-		{Image: img2, Size: 3, ListX: 800, ListY: 380},
-		{Image: img1, Size: 1, ListX: 800, ListY: 440},
+		{Image: img3, SunkImage: battleAssets.SunkShip3, Size: 6, ListX: 800, ListY: 100},
+		{Image: img3, SunkImage: battleAssets.SunkShip3, Size: 6, ListX: 800, ListY: 160},
+		{Image: img4, SunkImage: battleAssets.SunkShip4, Size: 4, ListX: 800, ListY: 250},
+		{Image: img4, SunkImage: battleAssets.SunkShip4, Size: 4, ListX: 800, ListY: 320},
+		{Image: img2, SunkImage: battleAssets.SunkShip2, Size: 3, ListX: 800, ListY: 380},
+		{Image: img1, SunkImage: battleAssets.SunkShip1, Size: 1, ListX: 800, ListY: 440},
 	}
 
 	s.board = b
@@ -148,7 +150,51 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 			}
 
 			factory := service.NewGameService()
-			gs := factory.NewBattleGameState(s.board, s.ships)
+			gs, enemyShips := factory.NewBattleGameState(s.board, s.ships)
+
+			// Assign images to enemy ships
+			battleAssets := LoadBattleAssets()
+			for _, ship := range enemyShips {
+				switch ship.Size {
+				case 6:
+					ship.SunkImage = battleAssets.SunkShip3
+				case 4:
+					ship.SunkImage = battleAssets.SunkShip4
+				case 3:
+					ship.SunkImage = battleAssets.SunkShip2
+				case 1:
+					ship.SunkImage = battleAssets.SunkShip1
+				}
+				// We don't need to set the normal Image because it won't be drawn unless sunk.
+				// But just in case, we could set it too if we had it.
+				// For now, let's assume DrawBoard handles nil Image if we only draw sunk.
+				// Actually, DrawShip checks if ship.Image == nil and returns.
+				// So we MUST set ship.Image as well, or modify DrawShip.
+				// Let's set ship.Image to the same sunk image or a placeholder if we want to be safe,
+				// or reuse the player's images if we can access them easily.
+				// The player's images are in s.ships but they are instanced.
+				// Loading them again is fine.
+			}
+
+			// We need to provide a valid Image for DrawShip to work, even if we swap it later.
+			// Let's load the images again.
+			img1, _, _ := ebitenutil.NewImageFromFile("assets/images/1 slot 1.png")
+			img2, _, _ := ebitenutil.NewImageFromFile("assets/images/3 slots 2.png")
+			img3, _, _ := ebitenutil.NewImageFromFile("assets/images/Frame 400.png")
+			img4, _, _ := ebitenutil.NewImageFromFile("assets/images/NAVIO 4 SLOTS 1.png")
+
+			for _, ship := range enemyShips {
+				switch ship.Size {
+				case 6:
+					ship.Image = img3
+				case 4:
+					ship.Image = img4
+				case 3:
+					ship.Image = img2
+				case 1:
+					ship.Image = img1
+				}
+			}
 
 			matchID := fmt.Sprintf("match-%d", time.Now().UnixNano())
 
@@ -157,6 +203,8 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				diff = s.stack.ctx.Difficulty
 			}
 
+
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, s.stack.ctx != nil && s.stack.ctx.IsDynamicMode)
 			isDynamic := s.stack.ctx != nil && s.stack.ctx.IsDynamicMode
 			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile, isDynamic)
 

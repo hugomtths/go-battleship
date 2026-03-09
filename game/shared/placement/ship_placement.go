@@ -7,6 +7,7 @@ import (
 
 type ShipPlacement struct {
 	Image        *ebiten.Image
+	SunkImage    *ebiten.Image
 	Size         int
 	Placed       bool
 	X, Y         int

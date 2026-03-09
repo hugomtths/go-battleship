@@ -22,6 +22,11 @@ type BattleAssets struct {
 	HitImage *ebiten.Image
 	// MissImage é a imagem estática exibida em um erro (círculo na água).
 	MissImage *ebiten.Image
+
+	SunkShip1 *ebiten.Image
+	SunkShip2 *ebiten.Image
+	SunkShip3 *ebiten.Image
+	SunkShip4 *ebiten.Image
 }
 
 // LoadBattleAssets carrega todos os assets necessários para a batalha de uma vez.
@@ -32,6 +37,10 @@ func LoadBattleAssets() *BattleAssets {
 		frames, delays, _ := assets.LoadFireAnimation()
 		hit, _ := assets.LoadHitImage()
 		miss, _ := assets.LoadMissImage()
+		sunk1, _ := assets.LoadSunkShip1()
+		sunk2, _ := assets.LoadSunkShip2()
+		sunk3, _ := assets.LoadSunkShip3()
+		sunk4, _ := assets.LoadSunkShip4()
 
 		if hit == nil && len(frames) > 0 {
 			hit = frames[0]
@@ -46,6 +55,10 @@ func LoadBattleAssets() *BattleAssets {
 			FireAnimation: fireAnim,
 			HitImage:      hit,
 			MissImage:     miss,
+			SunkShip1:     sunk1,
+			SunkShip2:     sunk2,
+			SunkShip3:     sunk3,
+			SunkShip4:     sunk4,
 		}
 	})
 

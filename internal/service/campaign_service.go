@@ -27,6 +27,8 @@ func (cs *CampaignService) StartCampaignMatch(
 	playerBoard *board.Board,
 	enemyBoard *board.Board,
 	playerEntityBoard *entity.Board,
+	enemyEntityBoard *entity.Board,
+	enemyFleet *entity.Fleet,
 	enemyShipCells int,
 	playerShipCells int,
 ) (*ai.AIPlayer, error) {
@@ -63,7 +65,9 @@ func (cs *CampaignService) StartCampaignMatch(
 		playerBoard,
 		enemyBoard,
 		playerEntityBoard,
+		enemyEntityBoard,
 		fleet,
+		enemyFleet,
 		enemyShipCells,
 		playerShipCells,
 	)

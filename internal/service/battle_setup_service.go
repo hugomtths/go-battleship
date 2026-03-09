@@ -19,15 +19,36 @@ func NewBattleSetupService() *BattleSetupService {
 // InitBattleAI inicializa a inteligência artificial com base na dificuldade selecionada.
 // Parâmetros:
 // - difficulty: string que define o nível ("easy", "medium", "hard")
-// - playerShips: os navios que o jogador posicionou (usados para espelhar a frota da IA)
-func (s *BattleSetupService) InitBattleAI(difficulty string, playerShips []*placement.ShipPlacement) (*ai.AIPlayer, *entity.Board, *entity.Fleet) {
+// - playerFleet: a frota do jogador (para a IA saber o que atacar)
+func (s *BattleSetupService) InitBattleAI(difficulty string, playerFleet *entity.Fleet) *ai.AIPlayer {
+	var aiPlayer *ai.AIPlayer
+
+	fmt.Printf("Iniciando batalha com dificuldade: %s\n", difficulty)
+
+	switch difficulty {
+	case "easy":
+		aiPlayer = ai.NewEasyAIPlayer()
+	case "medium":
+		aiPlayer = ai.NewMediumAIPlayer(playerFleet)
+	case "hard":
+		aiPlayer = ai.NewHardAIPlayer(playerFleet)
+	default:
+		aiPlayer = ai.NewEasyAIPlayer()
+	}
+	fmt.Printf("AI Player Instanciado: %v\n", reflect.TypeOf(aiPlayer))
+
+	return aiPlayer
+}
+
+// BuildEntityBoard constrói a representação lógica do tabuleiro e da frota
+// a partir dos navios posicionados visualmente.
+func (s *BattleSetupService) BuildEntityBoard(ships []*placement.ShipPlacement) (*entity.Board, *entity.Fleet) {
 	fleet := entity.NewFleet()
 	entityBoard := &entity.Board{}
 
 	usedShips := make(map[int]bool)
 
-	// Mapeamento dos navios posicionados para a estrutura lógica da IA
-	for _, ps := range playerShips {
+	for _, ps := range ships {
 		if !ps.Placed {
 			continue
 		}
@@ -46,22 +67,5 @@ func (s *BattleSetupService) InitBattleAI(difficulty string, playerShips []*plac
 			entityBoard.PlaceShip(entShip, ps.Y, ps.X)
 		}
 	}
-
-	var aiPlayer *ai.AIPlayer
-
-	fmt.Printf("Iniciando batalha com dificuldade: %s\n", difficulty)
-	
-	switch difficulty {
-	case "easy":
-		aiPlayer = ai.NewEasyAIPlayer()
-	case "medium":
-		aiPlayer = ai.NewMediumAIPlayer(fleet)
-	case "hard":
-		aiPlayer = ai.NewHardAIPlayer(fleet)
-	default:
-		aiPlayer = ai.NewEasyAIPlayer()
-	}
-	fmt.Printf("AI Player Instanciado: %v\n", reflect.TypeOf(aiPlayer))
-
-	return aiPlayer, entityBoard, fleet
+	return entityBoard, fleet
 }

@@ -338,8 +338,8 @@ func (s *BattleScene) Draw(screen *ebiten.Image) {
 	}
 
 	if s.boardView != nil {
-		s.boardView.DrawBoard(screen, playerBoard, match.PlayerShips)
-		s.boardView.DrawBoard(screen, aiBoard, nil)
+		s.boardView.DrawBoard(screen, playerBoard, match.PlayerShips, match.PlayerFleet, match.PlayerEntityBoard, false)
+		s.boardView.DrawBoard(screen, aiBoard, match.EnemyShips, match.EnemyFleet, match.EnemyEntityBoard, true)
 	}
 
 	s.backButtonContainer.Draw(screen)

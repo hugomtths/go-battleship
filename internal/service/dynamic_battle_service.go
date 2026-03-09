@@ -97,7 +97,9 @@ func NewDynamicBattleServiceFromMatch(match *entity.Match, isCampaign bool) (Dyn
 			match.PlayerBoard,
 			match.EnemyBoard,
 			playerEntityBoard,
+			aiBoard,
 			playerFleet,
+			aiFleet,
 			totalEnemyCells,
 			totalPlayerCells,
 		); err != nil {
