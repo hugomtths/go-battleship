@@ -15,14 +15,14 @@ import (
 // alinhamento, deixe em 0,0, caso queira mexer, ficará deslocado na posição alinhada + o valor da pos,
 // como se começasse na posição do pai)
 type Button struct {
-	pos, currentPos            basic.Point //POSIÇÃO RELATIVA AO PAI VS POSIÇÃO ATUAL NA TELA COMO UM TOD0 !
-	size                       basic.Size
-	label                      string
-	backgroundColor, textColor color.Color
-	CallBack                   func(*Button) //função que o botão chama
-	hoverColor, disabledColor  color.Color
-	disabled, hovered, clicked bool
-	body                       StylableWidget //um body por ex
+	pos, currentPos                     basic.Point //POSIÇÃO RELATIVA AO PAI VS POSIÇÃO ATUAL NA TELA COMO UM TOD0 !
+	size                                basic.Size
+	label                               string
+	backgroundColor, textColor          color.Color
+	CallBack                            func(*Button) //função que o botão chama
+	hoverColor, disabledColor           color.Color
+	disabled, hovered, clicked, pressed bool
+	body                                StylableWidget //um body por ex
 }
 
 func NewButton(
@@ -152,10 +152,20 @@ func (b *Button) clickVerify(mouseX, mouseY int) {
 	if b.disabled {
 		return
 	}
+	inside := inputhelper.IsHovered(mouseX, mouseY, b.currentPos, b.GetSize())
 
-	b.clicked = inputhelper.IsClicked(mouseX, mouseY, b.currentPos, b.GetSize())
+	mousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	// preciso para resolver problema de clique varando telas
+	if mousePressed && inside && !b.pressed {
+		b.pressed = true
+	}
 
-	if b.clicked && b.CallBack != nil {
-		b.CallBack(b)
+	// soltou o botão
+	if !mousePressed && b.pressed {
+		b.pressed = false
+
+		if inside && b.CallBack != nil {
+			b.CallBack(b)
+		}
 	}
 }

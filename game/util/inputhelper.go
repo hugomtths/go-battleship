@@ -1,4 +1,4 @@
-//Package inputhelper funções utilitárias para lidar com entrada
+// Package inputhelper funções utilitárias para lidar com entrada
 package inputhelper
 
 import (
@@ -17,14 +17,9 @@ func IsHovered(x, y int, pos basic.Point, size basic.Size) bool {
 		my <= pos.Y+size.H
 }
 
-//IsClicked verifica clique na posição (field pos) e tamanho (field size) especificado
+// IsClicked verifica clique na posição (field pos) e tamanho (field size) especificado
 func IsClicked(x, y int, pos basic.Point, size basic.Size) bool {
-	return IsHovered(x, y, pos, size) && inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft)
-}
-
-//IsPressed verifica se o botão está sendo pressionado na área
-func IsPressed(x, y int, pos basic.Point, size basic.Size) bool {
-	return IsHovered(x, y, pos, size) && ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+	return IsHovered(x, y, pos, size) && inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft)
 }
 
 // ReceiveText Atualiza o texto com os caracteres digitados e trata backspace
@@ -38,7 +33,7 @@ func ReceiveText(text *string, active bool) {
 	*text = string(runes)
 
 	// backspace
-    if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(*text) > 0 {
-        *text = (*text)[:len(*text)-1]
-    }
+	if inpututil.IsKeyJustPressed(ebiten.KeyBackspace) && len(*text) > 0 {
+		*text = (*text)[:len(*text)-1]
+	}
 }
