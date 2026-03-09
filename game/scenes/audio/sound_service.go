@@ -34,7 +34,7 @@ func (ss *SoundService) LoadMusic(name, path string) {
 }
 
 // Play toca musica //loop=true repete //fade entre musicas
-func (ss *SoundService) Play(name string) {
+func (ss *SoundService) Play(name string, vol float64) {
 	if ss.current != nil && ss.current != ss.musics[name] {
 		// fade out da música atual
 		ss.current.FadeTo(0, fadeDuration)
@@ -45,7 +45,7 @@ func (ss *SoundService) Play(name string) {
 		// fade in da nova música
 		newMusic.volume = 0
 		newMusic.Play()
-		newMusic.FadeTo(1, fadeDuration)
+		newMusic.FadeTo(vol, fadeDuration)
 		ss.current = newMusic
 	}
 }

@@ -85,6 +85,10 @@ func (m *Music) SetVolume(vol float64) {
 	m.player.SetVolume(vol)
 }
 
+func (m *Music) GetVolume() float64 {
+	return m.volume
+}
+
 func (m *Music) SetOriginalVolume(vol float64) {
 	m.lock.Lock()
 	defer m.lock.Unlock()

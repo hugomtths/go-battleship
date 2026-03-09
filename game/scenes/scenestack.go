@@ -80,12 +80,16 @@ func (s *SceneStack) Push(next Scene) {
 
 func (s *SceneStack) switchMusic(prev, next Scene) {
 	if prev == nil {
-		s.ctx.SoundService.Play(next.GetMusic())
+		s.ctx.SoundService.Play(next.GetMusic(), 1) //ja faz o fade
 		return
 	}
 	if music := next.GetMusic(); music != "" && music != prev.GetMusic() {
-		s.ctx.SoundService.StopCurrent()
-		s.ctx.SoundService.Play(music)
+		var vol float64
+		if prev != nil {
+			prevMusic := s.ctx.SoundService.GetMusic(prev.GetMusic())
+			vol = prevMusic.GetVolume()
+		}
+		s.ctx.SoundService.Play(music, vol)
 	}
 }
 
