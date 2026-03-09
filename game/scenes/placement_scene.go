@@ -201,9 +201,8 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				diff = s.stack.ctx.Difficulty
 			}
 
-			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, s.stack.ctx != nil && s.stack.ctx.IsDynamicMode)
 			isDynamic := s.stack.ctx != nil && s.stack.ctx.IsDynamicMode
-			//match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile, isDynamic)
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, isDynamic)
 
 			if s.stack.ctx != nil {
 				s.stack.ctx.Match = match
