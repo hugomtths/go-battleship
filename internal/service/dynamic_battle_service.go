@@ -62,9 +62,31 @@ func NewDynamicBattleServiceFromMatch(match *entity.Match, isCampaign bool) (Dyn
 		aiFleet := entity.NewFleet()
 		aiBoard := &entity.Board{}
 
-		// Posiciona navios da IA aleatoriamente
-		aiFleetSvc := NewAIFleetService()
-		aiFleetSvc.PositionShipsRandomly(aiBoard, aiFleet)
+		// Mapeamento dos navios da IA (já posicionados visualmente) para a estrutura lógica
+		usedEnemyShips := make(map[int]bool)
+		for _, ps := range match.EnemyShips {
+			if ps == nil || !ps.Placed {
+				continue
+			}
+
+			var entShip *entity.Ship
+			for i, ship := range aiFleet.Ships {
+				if !usedEnemyShips[i] && ship.Size == ps.Size {
+					entShip = ship
+					usedEnemyShips[i] = true
+					break
+				}
+			}
+
+			if entShip != nil {
+				entShip.Horizontal = ps.Orientation == board.Horizontal
+				if !aiBoard.PlaceShip(entShip, ps.Y, ps.X) {
+					fmt.Printf("ERRO: Falha ao posicionar navio lógico IA (tamanho %d) em %d,%d\n", entShip.Size, ps.Y, ps.X)
+				}
+			} else {
+				fmt.Printf("ERRO: Não encontrou navio lógico IA para tamanho %d\n", ps.Size)
+			}
+		}
 
 		match.EnemyFleet = aiFleet
 		match.EnemyEntityBoard = aiBoard
