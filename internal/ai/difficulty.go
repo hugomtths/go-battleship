@@ -39,7 +39,8 @@ func NewDynamicAIPlayer(enemyFleet *entity.Fleet, ownBoard *entity.Board) *AIPla
 		ownBoard:     ownBoard,
 		evasionQueue: make([]*entity.Ship, 0), // inicializa fila vazia
 		Strategies: []Strategy{
-			&EvasionStrategy{},
+			//&EvasionStrategy{},
+			&RandomMoveStrategy{Chance: 40}, // 2º: move aleatoriamente 40% das vezes
 			&StrategicSearchStrategy{},
 			&FullLineStrategy{},
 			&DiscoveryStrategy{},

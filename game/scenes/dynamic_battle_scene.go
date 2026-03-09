@@ -32,18 +32,23 @@ func NewDynamicBattleScene() *DynamicBattleScene {
 }
 
 func (s *DynamicBattleScene) OnEnter(prev Scene, size basic.Size) {
-	s.BattleScene.OnEnter(prev, size)
-
 	if s.ctx == nil || s.ctx.Match == nil {
 		return
 	}
 
 	match := s.ctx.Match
-	// Inicializa o DynamicBattleService
-	if svc, err := service.NewDynamicBattleServiceFromMatch(match, s.ctx.IsCampaign); err == nil {
+
+	// Cria o DynamicBattleService ANTES de chamar BattleScene.OnEnter,
+	// para que o pai não instancie um serviço comum (sem ownBoard).
+	svc, err := service.NewDynamicBattleServiceFromMatch(match, s.ctx.IsCampaign)
+	if err == nil {
 		s.dynamicBattleSvc = svc
-		s.battleSvc = svc // compatibilidade com BattleScene
+		s.battleSvc = svc         // compatibilidade com BattleScene
+		s.ctx.BattleService = svc // injeta no contexto para BattleScene.OnEnter não recriar
 	}
+
+	// Agora o pai encontra s.ctx.BattleService != nil e reutiliza sem criar outro AIPlayer
+	s.BattleScene.OnEnter(prev, size)
 
 	// Controlador de entrada para o tabuleiro do jogador (para seleção)
 	s.playerInputCtrl = components.NewBattleInput(match.PlayerBoard)

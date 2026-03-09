@@ -203,28 +203,36 @@ func (s *PlacementScene) OnEnter(prev Scene, size basic.Size) {
 				diff = s.stack.ctx.Difficulty
 			}
 
-			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, s.stack.ctx != nil && s.stack.ctx.IsDynamicMode)
 
-			svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
-			if err != nil {
-				fmt.Println("Erro ao criar serviço de batalha:", err)
-				return
-			}
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, enemyShips, s.playerProfile, s.stack.ctx != nil && s.stack.ctx.IsDynamicMode)
+			isDynamic := s.stack.ctx != nil && s.stack.ctx.IsDynamicMode
+			match := entity.NewMatch(matchID, diff, gs.PlayerBoard, gs.AIBoard, s.ships, s.playerProfile, isDynamic)
 
 			if s.stack.ctx != nil {
-				s.stack.ctx.SetMatch(match)
-				s.stack.ctx.SetBattleService(svc)
+				s.stack.ctx.Match = match
+				s.stack.ctx.BattleService = nil // limpa para forçar recriação correta
 			}
 
-			// Configura a cena de batalha com o estado da série
+			// Para modo dinâmico: NÃO cria BattleService aqui.
+			// A DynamicBattleScene cria o próprio serviço com NewDynamicAIPlayer (com ownBoard).
+			if !isDynamic {
+				svc, err := service.NewBattleServiceFromMatch(match, s.ctx != nil && s.ctx.IsCampaign)
+				if err != nil {
+					return
+				}
+				if s.stack.ctx != nil {
+					s.stack.ctx.BattleService = svc
+				}
+			}
+
 			var battleScene Scene
-			if s.stack.ctx != nil && s.stack.ctx.IsDynamicMode {
-				battleScene = NewDynamicBattleScene()
+			if isDynamic {
+				ds := NewDynamicBattleScene()
+				ds.SetSeriesState(s.matchIndex, s.seriesScorePlayer, s.seriesScoreEnemy)
+				battleScene = ds
 			} else {
 				bs := NewBattleScene()
-				if s.ctx != nil && s.ctx.IsCampaign {
-					bs.SetSeriesState(s.matchIndex, s.seriesScorePlayer, s.seriesScoreEnemy)
-				}
+				bs.SetSeriesState(s.matchIndex, s.seriesScorePlayer, s.seriesScoreEnemy)
 				battleScene = bs
 			}
 

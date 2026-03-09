@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/allanjose001/go-battleship/game/shared/board"
@@ -68,11 +69,13 @@ func NewDynamicBattleServiceFromMatch(match *entity.Match, isCampaign bool) (Dyn
 		match.EnemyFleet = aiFleet
 		match.EnemyEntityBoard = aiBoard
 
-		// Cria o DynamicAIPlayer
-		// NewDynamicAIPlayer(enemyFleet *entity.Fleet, ownBoard *entity.Board)
-		// enemyFleet: frota do JOGADOR (que a IA quer atacar)
-		// ownBoard: board da IA (que a IA quer defender/evadir)
+		// Cria o DynamicAIPlayer APÓS atribuir EnemyEntityBoard ao match
 		aiPlayer = ai.NewDynamicAIPlayer(match.PlayerFleet, match.EnemyEntityBoard)
+
+		// Adicione este log para confirmar
+		if match.EnemyEntityBoard == nil {
+			return nil, fmt.Errorf("EnemyEntityBoard nil após atribuição")
+		}
 
 		totalPlayerCells := 0
 		for _, ship := range playerFleet.GetFleetShips() {

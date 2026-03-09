@@ -214,7 +214,7 @@ func resolveModeLabel(result entity.MatchResult) (string, color.Color) {
 	if result.Mode == "Campanha" {
 		return "CAMPANHA", colors.GoldMedal
 	}
-	if result.Mode == "Dinamica" {
+	if result.Mode == "Dinâmico" {
 		return "DINÂMICA", colors.SilverMedal
 	}
 	return "CLÁSSICA", colors.White
