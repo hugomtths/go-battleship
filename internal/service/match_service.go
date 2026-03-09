@@ -206,7 +206,11 @@ func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gam
 		return nil
 	}
 
-	if !hit {
+	if hit {
+		// atualiza score de forma limpa
+		m.UpdateScore(true, now)
+	} else {
+		// passa turno para a IA
 		m.Turn = entity.TurnEnemy
 		m.NextAction = entity.NextActionEnemyAttack
 		m.NextActionAt = now.Add(s.aiDelay)
