@@ -30,6 +30,7 @@ func NewGameOverScene(winnerName string, result *entity.MatchResult, actionLabel
 }
 
 func (s *GameOverScene) GetMusic() string {
+	s.ctx.SoundService.PlaySFX("fah", 1)
 	return "loss"
 }
 
