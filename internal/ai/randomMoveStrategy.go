@@ -25,7 +25,7 @@ func (s *RandomMoveStrategy) TryAttack(ai *AIPlayer, board *entity.Board) bool {
 	// Rolagem de dado: só age com a probabilidade definida
 	chance := s.Chance
 	if chance <= 0 {
-		chance = 40 // padrão: 40%
+		chance = 15 // padrão: 40%
 	}
 	if rand.Intn(100) >= chance {
 		fmt.Println("randomMoveStrategy: não ativou neste turno (sorte)")

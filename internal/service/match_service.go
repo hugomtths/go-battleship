@@ -209,7 +209,7 @@ func (s *MatchService) applyPlayerAttack(m *entity.Match, row, col int) (hit boo
 
 func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gameOver bool, ev *entity.AttackEvent) error {
 	if hit {
-		s.ss.PlaySFX("attack", 0.8)
+		s.ss.PlaySFX("attack", 0.6)
 		// atualiza score de forma limpa
 		m.UpdateScore(true, now)
 	}
@@ -220,7 +220,7 @@ func (s *MatchService) postPlayerAttack(m *entity.Match, now time.Time, hit, gam
 	}
 
 	if !hit {
-		s.ss.PlaySFX("watersplash", 0.8)
+		s.ss.PlaySFX("watersplash", 1)
 		// passa turno para a IA
 		m.Turn = entity.TurnEnemy
 		m.NextAction = entity.NextActionEnemyAttack
@@ -274,11 +274,14 @@ func (s *MatchService) applyEnemyStep(m *entity.Match, aiPlayer *ai.AIPlayer) (h
 	hit = m.EnemyHits > prevHits
 
 	if hit {
+		s.ss.PlaySFX("attack", 0.6)
 		m.EnemyHitStreak++
 		if m.EnemyHitStreak > m.EnemyMaxHitStreak {
 			m.EnemyMaxHitStreak = m.EnemyHitStreak
 		}
 	} else {
+		s.ss.PlaySFX("watersplash", 1)
+
 		m.EnemyHitStreak = 0
 	}
 
@@ -292,6 +295,7 @@ func (s *MatchService) postEnemyStep(m *entity.Match, now time.Time, hit, gameOv
 	}
 
 	if hit {
+
 		m.NextAction = entity.NextActionEnemyAttack
 		m.NextActionAt = now.Add(s.aiDelay)
 	} else {
