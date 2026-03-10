@@ -2,12 +2,12 @@
   {
     "username": "caua de souza",
     "player_stats": {
-      "matches": 4,
-      "wins": 2,
-      "total_shots": 314,
-      "total_hits": 86,
-      "high_score": 511,
-      "total_score": 511,
+      "matches": 6,
+      "wins": 3,
+      "total_shots": 442,
+      "total_hits": 133,
+      "high_score": 613,
+      "total_score": 1488,
       "higher_hit_sequence": 6,
       "faster_time": 0,
       "win_without_losses": true
@@ -65,6 +65,30 @@
         "killed_ships": 0,
         "duration": 151774,
         "mode": "Clássica"
+      },
+      {
+        "win": false,
+        "difficulty": "hard",
+        "player_shots": 61,
+        "hits": 23,
+        "higher_hit_sequence": 6,
+        "score": 364,
+        "lost_ships": 4,
+        "killed_ships": 0,
+        "duration": 290476,
+        "mode": "Clássica"
+      },
+      {
+        "win": true,
+        "difficulty": "easy",
+        "player_shots": 67,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 613,
+        "lost_ships": 2,
+        "killed_ships": 0,
+        "duration": 94315,
+        "mode": "Clássica"
       }
     ],
     "current_campaign": {
@@ -75,49 +99,14 @@
     "campaigns": null
   },
   {
-    "username": "malub",
-    "player_stats": {
-      "matches": 0,
-      "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
-      "high_score": 0,
-      "total_score": 0,
-      "higher_hit_sequence": 0,
-      "faster_time": 0,
-      "win_without_losses": false
-    },
-    "medals": null,
-    "history": null,
-    "current_campaign": {
-      "id": "camp_malub",
-      "difficulty_step": {
-        "easy": {
-          "win": true,
-          "difficulty": "",
-          "player_shots": 0,
-          "hits": 0,
-          "higher_hit_sequence": 0,
-          "score": 500,
-          "lost_ships": 0,
-          "killed_ships": 0,
-          "duration": 0,
-          "mode": ""
-        }
-      },
-      "is_active": true
-    },
-    "campaigns": null
-  },
-  {
     "username": "Luis Henrique",
     "player_stats": {
-      "matches": 12,
-      "wins": 11,
-      "total_shots": 994,
-      "total_hits": 311,
+      "matches": 14,
+      "wins": 12,
+      "total_shots": 1147,
+      "total_hits": 352,
       "high_score": 774,
-      "total_score": 2052,
+      "total_score": 2927,
       "higher_hit_sequence": 8,
       "faster_time": 0,
       "win_without_losses": true
@@ -272,6 +261,30 @@
         "killed_ships": 0,
         "duration": 102127,
         "mode": "Campanha"
+      },
+      {
+        "win": true,
+        "difficulty": "easy",
+        "player_shots": 63,
+        "hits": 24,
+        "higher_hit_sequence": 6,
+        "score": 584,
+        "lost_ships": 1,
+        "killed_ships": 0,
+        "duration": 82832,
+        "mode": "Clássica"
+      },
+      {
+        "win": false,
+        "difficulty": "hard",
+        "player_shots": 90,
+        "hits": 17,
+        "higher_hit_sequence": 3,
+        "score": 291,
+        "lost_ships": 6,
+        "killed_ships": 0,
+        "duration": 133414,
+        "mode": "Clássica"
       }
     ],
     "current_campaign": {
@@ -287,112 +300,6 @@
           "lost_ships": 1,
           "killed_ships": 0,
           "duration": 102127,
-          "mode": "Campanha"
-        }
-      },
-      "is_active": true
-    },
-    "campaigns": null
-  },
-  {
-    "username": "luis pipito",
-    "player_stats": {
-      "matches": 0,
-      "wins": 0,
-      "total_shots": 0,
-      "total_hits": 0,
-      "high_score": 0,
-      "total_score": 0,
-      "higher_hit_sequence": 0,
-      "faster_time": 0,
-      "win_without_losses": false
-    },
-    "medals": null,
-    "history": null,
-    "current_campaign": null,
-    "campaigns": null
-  },
-  {
-    "username": "luisz",
-    "player_stats": {
-      "matches": 4,
-      "wins": 4,
-      "total_shots": 319,
-      "total_hits": 120,
-      "high_score": 1240,
-      "total_score": 2500,
-      "higher_hit_sequence": 8,
-      "faster_time": 0,
-      "win_without_losses": true
-    },
-    "medals": [
-      "Almirante",
-      "Capitão",
-      "Capitão de Mar e Guerra"
-    ],
-    "history": [
-      {
-        "win": true,
-        "difficulty": "easy",
-        "player_shots": 59,
-        "hits": 24,
-        "higher_hit_sequence": 7,
-        "score": 0,
-        "lost_ships": 0,
-        "killed_ships": 0,
-        "duration": 40219,
-        "mode": "Clássica"
-      },
-      {
-        "win": true,
-        "difficulty": "easy",
-        "player_shots": 64,
-        "hits": 24,
-        "higher_hit_sequence": 5,
-        "score": 676,
-        "lost_ships": 0,
-        "killed_ships": 0,
-        "duration": 39098,
-        "mode": "Clássica"
-      },
-      {
-        "win": true,
-        "difficulty": "easy",
-        "player_shots": 57,
-        "hits": 24,
-        "higher_hit_sequence": 5,
-        "score": 584,
-        "lost_ships": 1,
-        "killed_ships": 0,
-        "duration": 84532,
-        "mode": "Clássica"
-      },
-      {
-        "win": true,
-        "difficulty": "easy",
-        "player_shots": 139,
-        "hits": 48,
-        "higher_hit_sequence": 8,
-        "score": 1240,
-        "lost_ships": 4,
-        "killed_ships": 0,
-        "duration": 195785,
-        "mode": "Campanha"
-      }
-    ],
-    "current_campaign": {
-      "id": "camp_1773092979",
-      "difficulty_step": {
-        "easy": {
-          "win": true,
-          "difficulty": "easy",
-          "player_shots": 139,
-          "hits": 48,
-          "higher_hit_sequence": 8,
-          "score": 1240,
-          "lost_ships": 4,
-          "killed_ships": 0,
-          "duration": 195785,
           "mode": "Campanha"
         }
       },
